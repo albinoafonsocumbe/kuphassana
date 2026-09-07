@@ -451,8 +451,8 @@ app.delete('/api/servicos/:id/imagem', verificarToken, apenasAdmin, async (req, 
 // ── Raiz ──────────────────────────────────────────────────────
 app.get('/', (req, res) => {
     res.json({
-        mensagem: 'API Agência Funerária — a funcionar!',
-        versao: '2.0.0',
+        mensagem: 'API Agência Funerária Kuphassana — a funcionar!',
+        versao: '2.1.0',
         rotas: ['/api/empresa', '/api/servicos', '/api/contactos', '/api/auth/login', '/api/dashboard']
     });
 });
