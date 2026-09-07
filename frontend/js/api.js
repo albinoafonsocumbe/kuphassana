@@ -2,24 +2,25 @@
  * api.js — Comunicação com a API da Agência Funerária Kuphassana
  */
 
+const RENDER_URL = 'https://kuphassana.onrender.com';
+
 // Detectar automaticamente o ambiente
 const API_BASE = (() => {
     const host = window.location.hostname;
-    // Desenvolvimento local
     if (host === 'localhost' || host === '127.0.0.1') {
         return 'http://localhost:3000/api';
     }
-    // Produção (Vercel) — usa proxy definido no vercel.json
+    // Produção — Vercel faz proxy para o Render via vercel.json
     return '/api';
 })();
 
-// URL base para imagens (uploads do Render)
+// URL base para imagens (uploads)
 const SIMG_BASE = (() => {
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') {
         return 'http://localhost:3000';
     }
-    // Em produção, o Vercel faz proxy para o Render
+    // Em produção, Vercel faz proxy de /uploads para o Render
     return '';
 })();
 

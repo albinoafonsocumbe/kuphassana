@@ -37,30 +37,37 @@ const upload = multer({
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // ── CORS ─────────────────────────────────────────────────────
-const origens = process.env.FRONTEND_URL
-    ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
-    : ['http://localhost:5500', 'http://127.0.0.1:5500'];
+const origensPermitidas = [
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
+    'http://localhost:3000',
+    'https://kuphassana.vercel.app',
+    'https://kuphassana.onrender.com',
+];
 
-// Em desenvolvimento aceitar qualquer origem local
-if (process.env.NODE_ENV !== 'production') {
-    origens.push('http://localhost:3000', 'http://127.0.0.1:3000');
+// Adicionar FRONTEND_URL se configurado nas variáveis de ambiente
+if (process.env.FRONTEND_URL) {
+    process.env.FRONTEND_URL.split(',').forEach(u => {
+        const trimmed = u.trim();
+        if (!origensPermitidas.includes(trimmed)) origensPermitidas.push(trimmed);
+    });
 }
 
 app.use(cors({
     origin: (origin, callback) => {
-        // Permitir requests sem origem (Postman, mobile apps, etc.)
-        if (!origin) return callback(null, true);
-        // Permitir origens configuradas
-        if (origens.some(o => origin.startsWith(o)) ||
-            origin.includes('.vercel.app') ||
-            origin.includes('.onrender.com')) {
+        if (!origin) return callback(null, true); // Postman, mobile, etc.
+        if (
+            origensPermitidas.some(o => origin === o) ||
+            origin.endsWith('.vercel.app') ||
+            origin.endsWith('.onrender.com')
+        ) {
             return callback(null, true);
         }
-        callback(new Error('CORS bloqueado'));
+        callback(new Error(`CORS bloqueado para: ${origin}`));
     },
-    methods:      ['GET','POST','PUT','DELETE','OPTIONS'],
+    methods:        ['GET','POST','PUT','DELETE','OPTIONS'],
     allowedHeaders: ['Content-Type','Authorization'],
-    credentials:  true
+    credentials:    true
 }));
 app.use(express.json());
 
@@ -446,6 +453,23 @@ app.get('/', (req, res) => {
         versao: '2.0.0',
         rotas: ['/api/empresa', '/api/servicos', '/api/contactos', '/api/auth/login', '/api/dashboard']
     });
+});
+
+// ── Setup automático da BD (apenas na primeira vez) ───────────
+app.get('/api/setup', async (req, res) => {
+    // Verificar chave secreta para evitar acesso não autorizado
+    const key = req.query.key;
+    if (key !== process.env.SETUP_KEY && key !== 'kuphassana-setup-2026') {
+        return res.status(403).json({ sucesso: false, mensagem: 'Acesso negado.' });
+    }
+    try {
+        // Criar todas as tabelas
+        const { execSync } = require('child_process');
+        execSync('node database/setup.js', { cwd: __dirname + '/..', stdio: 'pipe' });
+        res.json({ sucesso: true, mensagem: 'Base de dados configurada com sucesso!' });
+    } catch (e) {
+        res.status(500).json({ sucesso: false, mensagem: e.message });
+    }
 });
 
 app.use((req, res) => res.status(404).json({ sucesso: false, mensagem: 'Rota não encontrada.' }));
