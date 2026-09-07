@@ -28,13 +28,13 @@ async function setup() {
             -- Inserir dados da empresa (apenas um registo)
             INSERT INTO empresa (nome, slogan, telefone, whatsapp, email, cidade, horario)
             VALUES (
-                'Agência Funerária Silva',
-                'Cuidamos de si e da sua família nos momentos mais difíceis',
-                '+351 912 345 678',
-                '351912345678',
-                'contacto@funeraria-silva.pt',
-                'Lisboa',
-                'Disponível 24 horas, 7 dias por semana'
+                'Agencia Funeraria Kuphassana',
+                'Cuidamos da sua Familia com Dignidade e Respeito',
+                '+258 84 123 4567',
+                '258841234567',
+                'contacto@kuphassana.co.mz',
+                'Maputo',
+                'Disponivel 24 horas, 7 dias por semana'
             )
             ON CONFLICT DO NOTHING;
         `);
