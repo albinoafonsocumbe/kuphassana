@@ -41,10 +41,26 @@ const origens = process.env.FRONTEND_URL
     ? process.env.FRONTEND_URL.split(',').map(o => o.trim())
     : ['http://localhost:5500', 'http://127.0.0.1:5500'];
 
+// Em desenvolvimento aceitar qualquer origem local
+if (process.env.NODE_ENV !== 'production') {
+    origens.push('http://localhost:3000', 'http://127.0.0.1:3000');
+}
+
 app.use(cors({
-    origin: origens,
-    methods: ['GET','POST','PUT','DELETE'],
-    allowedHeaders: ['Content-Type','Authorization']
+    origin: (origin, callback) => {
+        // Permitir requests sem origem (Postman, mobile apps, etc.)
+        if (!origin) return callback(null, true);
+        // Permitir origens configuradas
+        if (origens.some(o => origin.startsWith(o)) ||
+            origin.includes('.vercel.app') ||
+            origin.includes('.onrender.com')) {
+            return callback(null, true);
+        }
+        callback(new Error('CORS bloqueado'));
+    },
+    methods:      ['GET','POST','PUT','DELETE','OPTIONS'],
+    allowedHeaders: ['Content-Type','Authorization'],
+    credentials:  true
 }));
 app.use(express.json());
 

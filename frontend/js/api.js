@@ -5,19 +5,22 @@
 // Detectar automaticamente o ambiente
 const API_BASE = (() => {
     const host = window.location.hostname;
+    // Desenvolvimento local
     if (host === 'localhost' || host === '127.0.0.1') {
-        return 'http://localhost:3000/api'; // desenvolvimento
+        return 'http://localhost:3000/api';
     }
-    return '/api'; // produção (Nginx proxy)
+    // Produção (Vercel) — usa proxy definido no vercel.json
+    return '/api';
 })();
 
-// URL base para imagens (uploads)
+// URL base para imagens (uploads do Render)
 const SIMG_BASE = (() => {
     const host = window.location.hostname;
     if (host === 'localhost' || host === '127.0.0.1') {
         return 'http://localhost:3000';
     }
-    return ''; // produção — Nginx serve os uploads na mesma origem
+    // Em produção, o Vercel faz proxy para o Render
+    return '';
 })();
 
 const Auth = {
