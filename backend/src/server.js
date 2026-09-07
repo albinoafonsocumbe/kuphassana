@@ -151,11 +151,36 @@ app.get('/api/auth/perfil', verificarToken, async (req, res) => {
 app.get('/api/empresa', async (req, res) => {
     try {
         const r = await pool.query('SELECT * FROM empresa ORDER BY id LIMIT 1');
-        // Se não há registo, devolver objecto vazio sem erro
         res.json({ sucesso: true, dados: r.rows[0] || null });
     } catch (e) {
-        console.error('Erro /api/empresa:', e.message);
-        res.status(500).json({ sucesso: false, mensagem: 'Erro interno.', detalhe: e.message });
+        console.error('ERRO /api/empresa:', e.message, e.code);
+        res.status(500).json({
+            sucesso: false,
+            mensagem: 'Erro interno.',
+            codigo: e.code,
+            detalhe: e.message
+        });
+    }
+});
+
+// GET /api/debug — diagnóstico da BD
+app.get('/api/debug', async (req, res) => {
+    try {
+        const tabelas = await pool.query(`
+            SELECT table_name
+            FROM information_schema.tables
+            WHERE table_schema = 'public'
+            ORDER BY table_name
+        `);
+        const conn = await pool.query('SELECT NOW() as agora, current_database() as bd');
+        res.json({
+            sucesso: true,
+            hora: conn.rows[0].agora,
+            bd: conn.rows[0].bd,
+            tabelas: tabelas.rows.map(r => r.table_name)
+        });
+    } catch (e) {
+        res.status(500).json({ sucesso: false, erro: e.message, codigo: e.code });
     }
 });
 
