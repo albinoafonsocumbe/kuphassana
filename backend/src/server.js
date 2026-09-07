@@ -151,9 +151,11 @@ app.get('/api/auth/perfil', verificarToken, async (req, res) => {
 app.get('/api/empresa', async (req, res) => {
     try {
         const r = await pool.query('SELECT * FROM empresa ORDER BY id LIMIT 1');
-        res.json({ sucesso: true, dados: r.rows[0] || {} });
+        // Se não há registo, devolver objecto vazio sem erro
+        res.json({ sucesso: true, dados: r.rows[0] || null });
     } catch (e) {
-        res.status(500).json({ sucesso: false, mensagem: 'Erro interno.' });
+        console.error('Erro /api/empresa:', e.message);
+        res.status(500).json({ sucesso: false, mensagem: 'Erro interno.', detalhe: e.message });
     }
 });
 
