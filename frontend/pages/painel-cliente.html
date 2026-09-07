@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>A Minha Área — Plataforma Funerária</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        body { background: #f0ede8; }
+
+        /* ── Navbar ── */
+        .painel-nav {
+            background: rgba(10,10,15,.97);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(201,168,76,.2);
+            padding: 0 2.5rem; height: 68px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-logo { font-family: var(--fonte-titulo); font-size: 1.2rem; color: var(--branco); display: flex; align-items: center; gap: .5rem; }
+        .nav-logo span { color: var(--dourado); }
+        .nav-dir { display: flex; align-items: center; gap: 1.5rem; }
+        .nav-dir a { color: rgba(255,255,255,.6); font-size: .85rem; transition: color .2s; }
+        .nav-dir a:hover { color: var(--branco); }
+        .usuario-badge { display: flex; align-items: center; gap: .65rem; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); border-radius: 50px; padding: .3rem .75rem .3rem .3rem; }
+        .usuario-avatar { width: 34px; height: 34px; background: var(--grad-dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: .9rem; color: var(--preto); }
+        .usuario-nome { font-size: .85rem; color: rgba(255,255,255,.8); font-weight: 500; }
+
+        /* ── Hero ── */
+        .painel-hero {
+            background: var(--grad-escuro);
+            padding: 2.75rem 2.5rem 2rem;
+            position: relative; overflow: hidden;
+        }
+        .painel-hero::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 80% 50%, rgba(201,168,76,.08) 0%, transparent 60%); }
+        .painel-hero::after  { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, var(--dourado), transparent); }
+        .hero-inner { max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1.5rem; }
+        .hero-inner h1 { font-family: var(--fonte-titulo); font-size: 1.85rem; color: var(--branco); margin-bottom: .3rem; }
+        .hero-inner h1 span { color: var(--dourado); }
+        .hero-inner p { color: rgba(255,255,255,.5); font-size: .88rem; }
+        .hero-acoes { display: flex; gap: .75rem; flex-wrap: wrap; }
+        .btn-explorar { background: var(--grad-dourado); color: var(--preto); border: none; border-radius: 50px; padding: .75rem 1.8rem; font-weight: 700; font-size: .9rem; cursor: pointer; transition: all .3s; white-space: nowrap; }
+        .btn-explorar:hover { transform: translateY(-2px); box-shadow: var(--sombra-dourada); }
+        .btn-apoio-hero { background: rgba(231,76,60,.15); color: #ff6b6b; border: 1px solid rgba(231,76,60,.3); border-radius: 50px; padding: .75rem 1.4rem; font-weight: 600; font-size: .88rem; cursor: pointer; transition: all .2s; }
+        .btn-apoio-hero:hover { background: rgba(231,76,60,.25); color: #fff; }
+
+        /* ── Stats ── */
+        .stats-row {
+            max-width: 1200px; margin: 0 auto;
+            padding: 2rem 2.5rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 1.25rem;
+        }
+        .stat-card {
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            padding: 1.3rem 1.5rem;
+            box-shadow: var(--sombra-sm);
+            display: flex; align-items: center; gap: 1rem;
+            border: 1px solid rgba(0,0,0,.04);
+            transition: box-shadow .2s;
+        }
+        .stat-card:hover { box-shadow: var(--sombra-md); }
+        .stat-icone {
+            width: 46px; height: 46px; border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; flex-shrink: 0;
+        }
+        .ic-ouro   { background: #fef9ec; }
+        .ic-verde  { background: #edfaf3; }
+        .ic-azul   { background: #edf3fb; }
+        .ic-roxo   { background: #f3edfb; }
+        .stat-info .num   { font-family: var(--fonte-titulo); font-size: 1.7rem; font-weight: 700; color: var(--cinza-escuro); line-height: 1; }
+        .stat-info .label { font-size: .78rem; color: var(--cor-texto-leve); margin-top: .25rem; font-weight: 500; }
+
+        /* ── Corpo ── */
+        .painel-corpo { max-width: 1200px; margin: 0 auto; padding: 2rem 2.5rem 4rem; }
+
+        /* ── Tabs ── */
+        .tabs { display: flex; gap: .25rem; border-bottom: 2px solid var(--cor-borda); margin-bottom: 2rem; flex-wrap: wrap; }
+        .tab-btn {
+            padding: .75rem 1.4rem; border: none; background: none;
+            font-family: var(--fonte-corpo); font-size: .88rem; font-weight: 600;
+            color: var(--cor-texto-leve); cursor: pointer;
+            border-bottom: 2px solid transparent; margin-bottom: -2px;
+            transition: all .2s; display: flex; align-items: center; gap: .4rem;
+        }
+        .tab-btn:hover { color: var(--cinza-escuro); }
+        .tab-btn.activo { color: var(--cinza-escuro); border-bottom-color: var(--dourado); font-weight: 700; }
+        .tab-badge {
+            background: var(--cinza-escuro); color: var(--dourado);
+            font-size: .7rem; padding: .1rem .45rem;
+            border-radius: 50px; font-weight: 700;
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.activo { display: block; }
+
+        /* ── Pedidos / Contactos do Cliente ── */
+        .pedidos-lista { display: flex; flex-direction: column; gap: 1.25rem; }
+        .pedido-card {
+            background: var(--branco);
+            border-radius: var(--raio-lg); box-shadow: var(--sombra-sm);
+            overflow: hidden; border: 1px solid rgba(0,0,0,.04);
+            transition: box-shadow .2s;
+        }
+        .pedido-card:hover { box-shadow: var(--sombra-md); }
+        .pedido-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--cor-borda);
+            flex-wrap: wrap; gap: .75rem;
+        }
+        .pedido-esq { display: flex; align-items: center; gap: 1rem; }
+        .ped-icone {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--branco-suave), var(--cinza-claro));
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-size: 1.25rem;
+            border: 1px solid var(--cor-borda); flex-shrink: 0;
+        }
+        .ped-nome { font-weight: 700; color: var(--cinza-escuro); font-size: .98rem; }
+        .ped-sub  { font-size: .8rem; color: var(--cor-texto-leve); margin-top: .15rem; }
+
+        .estado-badge {
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .3rem .9rem; border-radius: 50px;
+            font-size: .75rem; font-weight: 700; letter-spacing: .2px;
+        }
+        .est-pendente  { background: #fef9ec; color: #92660a; border: 1px solid #f5e4a0; }
+        .est-confirmado{ background: #edfaf3; color: #1a6b3a; border: 1px solid #9fdfc0; }
+        .est-cancelado { background: #fef0f0; color: #8b2635; border: 1px solid #f5c0c8; }
+        .est-concluido { background: #edf3fb; color: #1a3a6b; border: 1px solid #9fc0e8; }
+
+        .pedido-corpo { padding: 1.25rem 1.75rem; }
+        .pedido-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.25rem; margin-bottom: 1.1rem;
+        }
+        .ped-detalhe label {
+            font-size: .72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .5px;
+            color: var(--cor-texto-leve); display: block; margin-bottom: .2rem;
+        }
+        .ped-detalhe span { font-size: .9rem; color: var(--cinza-escuro); font-weight: 500; }
+        .ped-detalhe span.preco { font-family: var(--fonte-titulo); font-size: 1.05rem; font-weight: 700; }
+
+        .ped-mensagem {
+            background: var(--branco-suave); border-radius: 8px;
+            padding: .85rem 1.1rem; font-size: .85rem;
+            color: var(--cor-texto-leve); border-left: 3px solid var(--dourado);
+            font-style: italic; margin-bottom: 1.25rem;
+        }
+
+        /* ── Bloco de Orçamento Emitido Recebido pelo Cliente ── */
+        .orcamento-cliente-box {
+            background: linear-gradient(135deg, #f0f7fd, #e6f0fa);
+            border: 1.5px solid #b8daf5;
+            border-radius: 12px;
+            padding: 1.2rem 1.4rem;
+            margin-bottom: 1.25rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1rem;
+        }
+        .orc-cli-info h4 {
+            color: #1a5276; font-size: 1rem; font-weight: 700; margin-bottom: .2rem;
+            display: flex; align-items: center; gap: .4rem;
+        }
+        .orc-cli-info p { font-size: .84rem; color: var(--cor-texto-leve); }
+        .btn-ver-orc-pdf {
+            background: linear-gradient(135deg, #1a252f, #2c3e50);
+            color: #f1c40f; border: 1px solid #f1c40f; border-radius: 50px;
+            padding: .6rem 1.3rem; font-size: .85rem; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: .4rem;
+            transition: all .2s; text-decoration: none;
+        }
+        .btn-ver-orc-pdf:hover { background: #f1c40f; color: #1a252f; transform: translateY(-2px); }
+
+        /* ── BARRAS DE AÇÃO DIRETA ── */
+        .canais-contacto-box {
+            background: #faf8f5;
+            border: 1px solid var(--cor-borda);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-top: .75rem;
+        }
+        .canais-titulo {
+            font-size: .75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .6px;
+            color: var(--cor-texto-leve); margin-bottom: .75rem;
+            display: flex; align-items: center; gap: .4rem;
+        }
+        .botoes-comunicacao {
+            display: flex; gap: .6rem; flex-wrap: wrap; align-items: center;
+        }
+
+        .btn-acao-com {
+            display: inline-flex; align-items: center; gap: .5rem;
+            padding: .55rem 1.15rem; border-radius: 50px;
+            font-size: .82rem; font-weight: 700; text-decoration: none;
+            cursor: pointer; transition: all .2s; border: none;
+            font-family: var(--fonte-corpo);
+        }
+        .btn-acao-com:hover { transform: translateY(-2px); }
+
+        .btn-com-whatsapp {
+            background: #25D366; color: #fff;
+            box-shadow: 0 2px 8px rgba(37,211,102,.25);
+        }
+        .btn-com-whatsapp:hover { background: #1ebe5d; box-shadow: 0 4px 14px rgba(37,211,102,.35); }
+
+        .btn-com-chamada {
+            background: var(--cinza-escuro); color: var(--branco);
+            box-shadow: 0 2px 8px rgba(0,0,0,.15);
+        }
+        .btn-com-chamada:hover { background: var(--preto); }
+
+        .btn-com-sms {
+            background: #007AFF; color: #fff;
+            box-shadow: 0 2px 8px rgba(0,122,255,.25);
+        }
+        .btn-com-sms:hover { background: #006ae0; }
+
+        .btn-com-email {
+            background: var(--branco); color: var(--cinza-escuro);
+            border: 1px solid var(--cor-borda);
+        }
+        .btn-com-email:hover { border-color: var(--dourado); color: var(--dourado); }
+
+        .btn-avaliar-servico {
+            background: #f39c12; color: #fff; border: none; border-radius: 50px;
+            padding: .55rem 1.1rem; font-size: .82rem; font-weight: 700;
+            cursor: pointer; display: inline-flex; align-items: center; gap: .35rem;
+            transition: all .2s;
+        }
+        .btn-avaliar-servico:hover { background: #d68910; transform: translateY(-2px); }
+
+        .btn-cancelar-ped {
+            margin-left: auto;
+            background: none; border: 1px solid #f5c0c8;
+            color: #8b2635; padding: .5rem .9rem; border-radius: 50px;
+            font-size: .78rem; font-weight: 600; cursor: pointer;
+            transition: all .2s; font-family: var(--fonte-corpo);
+        }
+        .btn-cancelar-ped:hover { background: #fef0f0; }
+
+        /* ── Diretório de Prestadores ── */
+        .filtro-prestadores-bar {
+            display: flex; gap: .75rem; margin-bottom: 1.5rem; flex-wrap: wrap;
+        }
+        .filtro-prestadores-bar input {
+            flex: 1; min-width: 220px;
+            padding: .7rem 1.1rem; border: 1.5px solid var(--cor-borda);
+            border-radius: 10px; font-size: .9rem; font-family: var(--fonte-corpo);
+            background: var(--branco); outline: none; transition: border-color .2s;
+        }
+        .filtro-prestadores-bar input:focus { border-color: var(--dourado); }
+
+        .prestadores-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+        }
+        .prestador-card-cli {
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            box-shadow: var(--sombra-sm);
+            padding: 1.5rem;
+            border: 1px solid rgba(0,0,0,.04);
+            display: flex; flex-direction: column; gap: .85rem;
+            transition: box-shadow .2s;
+        }
+        .prestador-card-cli:hover { box-shadow: var(--sombra-md); }
+        .prestador-top {
+            display: flex; align-items: center; gap: 1rem;
+        }
+        .prestador-avatar-c {
+            width: 50px; height: 50px; border-radius: 14px;
+            background: var(--grad-dourado); color: var(--preto);
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--fonte-titulo); font-size: 1.3rem;
+            font-weight: 700; flex-shrink: 0; background-size: cover; background-position: center;
+        }
+        .prestador-info-c h3 { font-family: var(--fonte-titulo); font-size: 1.05rem; color: var(--cinza-escuro); margin-bottom: .2rem; }
+        .prestador-info-c p  { font-size: .8rem; color: var(--cor-texto-leve); }
+
+        /* ── Guia de Emergência 24h ── */
+        .guia-card {
+            background: var(--branco); border-radius: var(--raio-lg);
+            box-shadow: var(--sombra-sm); overflow: hidden;
+            border: 1px solid rgba(0,0,0,.04); margin-bottom: 2rem;
+        }
+        .guia-header {
+            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            padding: 1.75rem 2rem; display: flex; align-items: center; gap: 1rem;
+        }
+        .guia-header .gi { font-size: 2rem; }
+        .guia-header h3 { font-family: var(--fonte-titulo); font-size: 1.25rem; color: var(--branco); margin-bottom: .2rem; }
+        .guia-header p  { font-size: .85rem; color: rgba(255,255,255,.6); }
+        .guia-passos { padding: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.75rem; }
+        .guia-passo { display: flex; gap: 1rem; align-items: flex-start; }
+        .gp-num { width: 38px; height: 38px; background: var(--grad-dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--fonte-titulo); font-size: 1.05rem; font-weight: 700; color: var(--preto); flex-shrink: 0; }
+        .gp-texto h4 { font-size: .95rem; font-weight: 700; color: var(--cinza-escuro); margin-bottom: .25rem; }
+        .gp-texto p  { font-size: .82rem; color: var(--cor-texto-leve); line-height: 1.5; }
+
+        /* ── MODAIS ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.6); z-index: 300;
+            display: none; align-items: center; justify-content: center;
+            padding: 1.5rem;
+        }
+        .modal-overlay.aberto { display: flex; }
+        .modal-box {
+            background: var(--branco); border-radius: var(--raio-lg);
+            padding: 2.25rem; max-width: 620px; width: 100%;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0,0,0,.35);
+            border-top: 4px solid var(--dourado);
+            animation: fadeUp .3s ease both;
+        }
+        .modal-box h3 {
+            font-family: var(--fonte-titulo); font-size: 1.25rem;
+            color: var(--cinza-escuro); margin-bottom: 1.25rem;
+        }
+
+        /* Seletor de Estrelas */
+        .estrelas-rating {
+            display: flex; gap: .5rem; font-size: 2rem; cursor: pointer;
+            margin: .75rem 0 1.25rem;
+        }
+        .estrela-item { color: #dcdcdc; transition: color .2s; }
+        .estrela-item.selecionada { color: #f39c12; }
+
+        /* Perfil */
+        .perfil-card { background: var(--branco); border-radius: var(--raio-lg); box-shadow: var(--sombra-sm); overflow: hidden; max-width: 560px; }
+        .perfil-header { background: var(--grad-escuro); padding: 2rem; display: flex; align-items: center; gap: 1.25rem; }
+        .perfil-avatar { width: 60px; height: 60px; background: var(--grad-dourado); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: var(--fonte-titulo); font-size: 1.5rem; font-weight: 700; color: var(--preto); flex-shrink: 0; }
+        .perfil-header .pnome  { font-family: var(--fonte-titulo); font-size: 1.15rem; color: var(--branco); }
+        .perfil-header .pemail { font-size: .82rem; color: rgba(255,255,255,.45); margin-top: .2rem; }
+        .perfil-corpo { padding: 1.75rem; }
+        .pf-grupo { margin-bottom: 1rem; }
+        .pf-grupo label { font-size: .73rem; font-weight: 700; text-transform: uppercase; letter-spacing: .6px; color: var(--cor-texto-leve); display: block; margin-bottom: .35rem; }
+        .pf-grupo input, .pf-grupo textarea { width: 100%; padding: .7rem 1rem; border: 1.5px solid var(--cor-borda); border-radius: 10px; font-size: .9rem; font-family: var(--fonte-corpo); outline: none; background: var(--branco-suave); transition: border-color .2s, box-shadow .2s; }
+        .pf-grupo input:focus, .pf-grupo textarea:focus { border-color: var(--dourado); background: var(--branco); box-shadow: 0 0 0 3px rgba(201,168,76,.1); }
+        .pf-grupo input:disabled { opacity: .5; cursor: not-allowed; }
+        .btn-guardar-pf { width: 100%; padding: .8rem; background: var(--cinza-escuro); color: var(--branco); border: none; border-radius: 10px; font-size: .92rem; font-weight: 700; cursor: pointer; transition: all .25s; font-family: var(--fonte-corpo); margin-top: .5rem; }
+        .btn-guardar-pf:hover { background: var(--dourado); color: var(--preto); }
+
+        /* Impressão Timbrada */
+        @media print {
+            body * { visibility: hidden; }
+            #printable-orcamento-cli, #printable-orcamento-cli * { visibility: visible; }
+            #printable-orcamento-cli { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+
+        .vazio { text-align: center; padding: 3.5rem 2rem; color: var(--cor-texto-leve); }
+        .vazio .vi { font-size: 3.2rem; margin-bottom: 1rem; opacity: .4; }
+        .vazio h3  { font-family: var(--fonte-titulo); font-size: 1.2rem; color: var(--cinza-escuro); margin-bottom: .5rem; }
+        .vazio p   { font-size: .88rem; max-width: 440px; margin: 0 auto 1.5rem; }
+
+        @media (max-width: 768px) {
+            .painel-nav  { padding: 0 1.25rem; }
+            .painel-hero { padding: 2rem 1.25rem 1.5rem; }
+            .stats-row   { padding: 1.25rem 1.25rem 0; }
+            .painel-corpo{ padding: 1.25rem 1.25rem 3rem; }
+            .botoes-comunicacao { flex-direction: column; align-items: stretch; }
+            .btn-cancelar-ped { margin-left: 0; text-align: center; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="painel-nav">
+    <div class="nav-logo">✝ Plataforma <span>Funerária</span></div>
+    <div class="nav-dir">
+        <a href="../index.html">Ver catálogo</a>
+        <div class="usuario-badge">
+            <div class="usuario-avatar" id="nav-avatar">?</div>
+            <span class="usuario-nome" id="nav-nome">—</span>
+        </div>
+        <a href="#" onclick="Auth.terminarSessao()" style="color:rgba(255,255,255,.35);font-size:.8rem;">Sair</a>
+    </div>
+</nav>
+
+<!-- ══ HERO ══ -->
+<div class="painel-hero">
+    <div class="hero-inner">
+        <div>
+            <h1>Olá, <span id="hero-nome">—</span> 👋</h1>
+            <p>Acompanhe os seus pedidos, consulte orçamentos oficiais e contacte agências funerárias certificadas</p>
+        </div>
+        <div class="hero-acoes">
+            <button class="btn-explorar" onclick="window.location.href='../index.html'">
+                🔍 Explorar serviços →
+            </button>
+            <button class="btn-apoio-hero" onclick="mudarTab('guia-24h', document.getElementById('tab-btn-guia'))">
+                🆘 Guia de Emergência 24h
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icone ic-ouro">📨</div>
+        <div class="stat-info">
+            <div class="num" id="st-total">—</div>
+            <div class="label">Pedidos & Contactos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icone ic-azul">⏳</div>
+        <div class="stat-info">
+            <div class="num" id="st-pendentes">—</div>
+            <div class="label">Aguardando resposta</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icone ic-verde">📄</div>
+        <div class="stat-info">
+            <div class="num" id="st-orcamentos">—</div>
+            <div class="label">Orçamentos Recebidos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icone ic-roxo">🏢</div>
+        <div class="stat-info">
+            <div class="num" id="st-prestadores">—</div>
+            <div class="label">Agências Disponíveis</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ CORPO ══ -->
+<div class="painel-corpo">
+
+    <div class="tabs">
+        <button class="tab-btn activo" id="tab-btn-pedidos" onclick="mudarTab('pedidos', this)">
+            📨 Os Meus Pedidos & Orçamentos
+            <span class="tab-badge" id="badge-pedidos">0</span>
+        </button>
+        <button class="tab-btn" id="tab-btn-prestadores" onclick="mudarTab('prestadores', this)">
+            👥 Agências Certificadas
+        </button>
+        <button class="tab-btn" id="tab-btn-guia" onclick="mudarTab('guia-24h', this)">
+            🆘 Guia de Emergência 24h
+        </button>
+        <button class="tab-btn" id="tab-btn-perfil" onclick="mudarTab('perfil', this)">
+            👤 Os Meus Dados
+        </button>
+    </div>
+
+    <!-- ══ TAB 1: MEUS PEDIDOS & ORÇAMENTOS ══ -->
+    <div id="tab-pedidos" class="tab-pane activo">
+        <div id="lista-pedidos-cliente" class="pedidos-lista">
+            <div class="vazio"><div class="vi">⏳</div><p>A carregar os seus pedidos e orçamentos…</p></div>
+        </div>
+    </div>
+
+    <!-- ══ TAB 2: AGÊNCIAS CERTIFICADAS ══ -->
+    <div id="tab-prestadores" class="tab-pane">
+        <div class="filtro-prestadores-bar">
+            <input type="text" id="input-busca-prestador" placeholder="🔍 Pesquisar agência por nome, cidade ou distrito…" oninput="filtrarPrestadores()" />
+        </div>
+        <div id="grid-prestadores-cliente" class="prestadores-grid">
+            <div class="vazio"><div class="vi">⏳</div><p>A carregar agências…</p></div>
+        </div>
+    </div>
+
+    <!-- ══ TAB 3: GUIA DE EMERGÊNCIA 24H ══ -->
+    <div id="tab-guia-24h" class="tab-pane">
+        <div class="guia-card">
+            <div class="guia-header">
+                <div class="gi">🆘</div>
+                <div>
+                    <h3>Guia de Apoio Imediato nos Primeiros Momentos de Perda</h3>
+                    <p>Orientação clara e passo a passo para apoiar a sua família com serenidade e dignidade</p>
+                </div>
+            </div>
+            <div class="guia-passos">
+                <div class="guia-passo">
+                    <div class="gp-num">1</div>
+                    <div class="gp-texto">
+                        <h4>Certificado de Óbito</h4>
+                        <p>Se o falecimento ocorreu em casa, chame o médico assistente ou ligue 112 para emissão do certificado. Se ocorreu no hospital, o documento é emitido pela instituição.</p>
+                    </div>
+                </div>
+                <div class="guia-passo">
+                    <div class="gp-num">2</div>
+                    <div class="gp-texto">
+                        <h4>Contactar a Agência Funerária</h4>
+                        <p>Escolha uma agência funerária certificada na sua localidade. As agências possuem <strong>Piquete 24 horas</strong> e tratam de todo o transporte e burocracia.</p>
+                    </div>
+                </div>
+                <div class="guia-passo">
+                    <div class="gp-num">3</div>
+                    <div class="gp-texto">
+                        <h4>Reunir Documentos</h4>
+                        <p>Tenha consigo o Cartão de Cidadão (ou BI/NIF) do falecido e o seu próprio documento de identificação como familiar responsável.</p>
+                    </div>
+                </div>
+                <div class="guia-passo">
+                    <div class="gp-num">4</div>
+                    <div class="gp-texto">
+                        <h4>Definir a Homenagem</h4>
+                        <p>A agência orientará a escolha entre Inumação (sepultura/jazigo) ou Cremação, local do velório (capela ardente ou igreja) e detalhes florais.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ TAB 4: PERFIL ══ -->
+    <div id="tab-perfil" class="tab-pane">
+        <div class="perfil-card">
+            <div class="perfil-header">
+                <div class="perfil-avatar" id="pf-av">?</div>
+                <div>
+                    <div class="pnome"  id="pf-nome-h">—</div>
+                    <div class="pemail" id="pf-email-h">—</div>
+                </div>
+            </div>
+            <div class="perfil-corpo">
+                <div class="pf-grupo">
+                    <label>Nome completo</label>
+                    <input type="text" id="pf-nome" />
+                </div>
+                <div class="pf-grupo">
+                    <label>Email de Acesso</label>
+                    <input type="email" id="pf-email" disabled />
+                </div>
+                <div class="pf-grupo">
+                    <label>Telefone / WhatsApp</label>
+                    <input type="tel" id="pf-telefone" placeholder="912 345 678" />
+                </div>
+                <div class="pf-grupo">
+                    <label>Cidade / Localidade</label>
+                    <input type="text" id="pf-cidade" placeholder="Ex: Lisboa" />
+                </div>
+                <button class="btn-guardar-pf" onclick="guardarPerfil()">
+                    <span id="btn-pf-txt">Guardar alterações</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- ══ MODAL DE AVALIAÇÃO (REVIEWS & RATINGS) ══ -->
+<div class="modal-overlay" id="modal-avaliacao">
+    <div class="modal-box">
+        <h3>⭐ Avaliar Atendimento e Serviço</h3>
+        <p style="font-size:.85rem;color:var(--cor-texto-leve);margin-bottom:1rem;">O seu testemunho ajuda outras famílias a escolher com confiança e transparência.</p>
+        
+        <form id="form-avaliacao" onsubmit="submeterAvaliacao(event)">
+            <input type="hidden" id="av-pedido-id" />
+            <input type="hidden" id="av-servico-id" />
+            <input type="hidden" id="av-prestador-id" />
+            <input type="hidden" id="av-rating-valor" value="5" />
+
+            <div style="text-align:center;">
+                <label style="font-size:.78rem;font-weight:700;text-transform:uppercase;color:var(--cor-texto-leve);">Classificação:</label>
+                <div class="estrelas-rating" id="rating-estrelas-box">
+                    <span class="estrela-item selecionada" data-v="1" onclick="definirRating(1)">★</span>
+                    <span class="estrela-item selecionada" data-v="2" onclick="definirRating(2)">★</span>
+                    <span class="estrela-item selecionada" data-v="3" onclick="definirRating(3)">★</span>
+                    <span class="estrela-item selecionada" data-v="4" onclick="definirRating(4)">★</span>
+                    <span class="estrela-item selecionada" data-v="5" onclick="definirRating(5)">★</span>
+                </div>
+                <div id="rating-texto-desc" style="font-size:.85rem;font-weight:700;color:#f39c12;margin-bottom:1.25rem;">Excelente (5/5)</div>
+            </div>
+
+            <div class="pf-grupo">
+                <label>O seu comentário / testemunho</label>
+                <textarea id="av-comentario" placeholder="Conte como foi o atendimento da agência funerária, a pontualidade, dignidade e apoio prestado à família..." rows="4" required></textarea>
+            </div>
+
+            <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.5rem;">
+                <button type="button" class="btn-cancelar-ped" style="border-color:#ccc;color:#666;" onclick="fecharModal('modal-avaliacao')">Cancelar</button>
+                <button type="submit" class="btn-explorar" style="padding:.65rem 1.6rem;">Enviar Avaliação</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══ MODAL DE VISUALIZAÇÃO DE ORÇAMENTO TIMBRADO ══ -->
+<div class="modal-overlay" id="modal-ver-orcamento">
+    <div class="modal-box" style="max-width:720px;">
+        <div id="orc-conteudo-modal">
+            <!-- Renderizado dinamicamente -->
+        </div>
+        <div style="display:flex;gap:.75rem;justify-content:flex-end;margin-top:1.5rem;">
+            <button type="button" class="btn-cancelar-ped" style="border-color:#ccc;color:#666;" onclick="fecharModal('modal-ver-orcamento')">Fechar</button>
+            <button type="button" class="btn-explorar" onclick="imprimirOrcamentoCliente()" style="background:#2c3e50;color:#f1c40f;">🖨️ Imprimir / Guardar PDF</button>
+        </div>
+    </div>
+</div>
+
+<!-- Div escondida para renderizar a folha de orçamento para impressão em A4 -->
+<div id="printable-orcamento-cli" style="display:none;"></div>
+
+<script src="../js/api.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   AUTENTICAÇÃO
+══════════════════════════════════════════ */
+if (!Auth.estaAutenticado()) window.location.href = 'login.html';
+const utilizador = Auth.lerUtilizador();
+if (utilizador?.papel === 'admin')     window.location.href = 'admin.html';
+if (utilizador?.papel === 'prestador') window.location.href = 'painel.html';
+
+const primeiroNome = (utilizador?.nome || 'Cliente').split(' ')[0];
+document.getElementById('nav-avatar').textContent = primeiroNome.charAt(0).toUpperCase();
+document.getElementById('nav-nome').textContent   = primeiroNome;
+document.getElementById('hero-nome').textContent  = primeiroNome;
+document.getElementById('pf-av').textContent      = primeiroNome.charAt(0).toUpperCase();
+document.getElementById('pf-nome-h').textContent  = utilizador?.nome  || '';
+document.getElementById('pf-email-h').textContent = utilizador?.email || '';
+document.getElementById('pf-email').value         = utilizador?.email || '';
+document.getElementById('pf-nome').value          = utilizador?.nome  || '';
+
+/* ══════════════════════════════════════════
+   ÍCONES E FORMATADORES
+══════════════════════════════════════════ */
+const icones = { funeral:'⚰️', cremação:'🕯️', cremacao:'🕯️', transporte:'🚗', urna:'🏺', flores:'🌹', outro:'✦' };
+const getIcone = c => icones[(c||'').toLowerCase()] || '✦';
+
+function formatarData(str) {
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function badgeIcone(estado) {
+    switch (estado) {
+        case 'pendente':   return '⏳';
+        case 'confirmado': return '✅';
+        case 'concluido':  return '🏁';
+        case 'cancelado':  return '✕';
+        default:           return '•';
+    }
+}
+
+function capitalizar(s) {
+    if (!s) return '';
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/* ══════════════════════════════════════════
+   TABS
+══════════════════════════════════════════ */
+function mudarTab(nome, el) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('activo'));
+    if (el) el.classList.add('activo');
+    document.getElementById(`tab-${nome}`).classList.add('activo');
+
+    if (nome === 'pedidos')     carregarMeusPedidos();
+    if (nome === 'prestadores') carregarPrestadores();
+    if (nome === 'perfil')      carregarPerfil();
+}
+
+/* ══════════════════════════════════════════
+   TAB 1: MEUS PEDIDOS & ORÇAMENTOS
+══════════════════════════════════════════ */
+let meusPedidos = [];
+
+async function carregarMeusPedidos() {
+    try {
+        const res = await api.pedidos.meus();
+        meusPedidos = res.dados || [];
+
+        const pendentes   = meusPedidos.filter(p => p.estado === 'pendente').length;
+        const orcamentos  = meusPedidos.filter(p => p.valor_orcamento).length;
+
+        document.getElementById('st-total').textContent       = meusPedidos.length;
+        document.getElementById('st-pendentes').textContent   = pendentes;
+        document.getElementById('st-orcamentos').textContent  = orcamentos;
+        document.getElementById('badge-pedidos').textContent  = meusPedidos.length;
+
+        renderizarMeusPedidos(meusPedidos);
+    } catch (e) {
+        mostrarToast('Erro ao carregar pedidos: ' + e.message, 'erro');
+    }
+}
+
+function renderizarMeusPedidos(pedidos) {
+    const el = document.getElementById('lista-pedidos-cliente');
+    if (!pedidos.length) {
+        el.innerHTML = `
+            <div class="vazio">
+                <div class="vi">🔍</div>
+                <h3>Ainda não realizou nenhum contacto</h3>
+                <p>Navegue pelo nosso catálogo de serviços funerários e contacte agências e prestadores certificados.</p>
+                <button class="btn-explorar" onclick="window.location.href='../index.html'">
+                    Explorar serviços disponíveis →
+                </button>
+            </div>`;
+        return;
+    }
+
+    const clienteNome = utilizador.nome || 'Cliente';
+
+    el.innerHTML = pedidos.map(p => {
+        const tel = p.prestador_telefone || '';
+        const msgWhats = `Olá ${p.prestador_nome}, sou o(a) ${clienteNome}. Estou a contactar relativamente ao serviço "${p.servico_nome}" (Pedido #${p.id}) solicitado na Plataforma Funerária.`;
+        const msgSMS   = `Olá ${p.prestador_nome}, sou ${clienteNome}. Contacto sobre o serviço "${p.servico_nome}" na Plataforma Funerária.`;
+
+        const linkWhatsApp = ContactUtils.linkWhatsApp(tel, msgWhats);
+        const linkChamada  = ContactUtils.linkChamada(tel);
+        const linkSMS      = ContactUtils.linkSMS(tel, msgSMS);
+        const emailPrestador = p.prestador_email || '';
+
+        return `
+            <div class="pedido-card">
+                <div class="pedido-header">
+                    <div class="pedido-esq">
+                        <div class="ped-icone">${getIcone(p.servico_categoria || p.servico_nome)}</div>
+                        <div>
+                            <div class="ped-nome">${p.servico_nome}</div>
+                            <div class="ped-sub">Agência: <strong>${p.prestador_nome}</strong> · Solicitado em ${formatarData(p.criado_em)}</div>
+                        </div>
+                    </div>
+                    <span class="estado-badge est-${p.estado}">
+                        ${badgeIcone(p.estado)} ${capitalizar(p.estado)}
+                    </span>
+                </div>
+
+                <div class="pedido-corpo">
+                    <div class="pedido-grid">
+                        <div class="ped-detalhe">
+                            <label>Agência Funerária</label>
+                            <span>${p.prestador_nome}</span>
+                        </div>
+                        <div class="ped-detalhe">
+                            <label>Localização</label>
+                            <span>📍 ${p.prestador_cidade || 'Portugal'}</span>
+                        </div>
+                        <div class="ped-detalhe">
+                            <label>Telefone / Piquete 24h</label>
+                            <span>📞 ${ContactUtils.formatarExibicao(tel)}</span>
+                        </div>
+                        <div class="ped-detalhe">
+                            <label>Preço Base de Catálogo</label>
+                            <span class="preco">${formatarPreco(p.servico_preco)}</span>
+                        </div>
+                    </div>
+
+                    ${p.mensagem ? `<div class="ped-mensagem"><strong>A sua mensagem:</strong> "${p.mensagem}"</div>` : ''}
+
+                    <!-- Bloco de Proposta de Orçamento Formal (se emitida pela agência) -->
+                    ${p.valor_orcamento ? `
+                        <div class="orcamento-cliente-box">
+                            <div class="orc-cli-info">
+                                <h4>📄 Proposta Formal de Orçamento: ${formatarPreco(p.valor_orcamento)}</h4>
+                                <p>A agência ${p.prestador_nome} emitiu uma proposta detalhada para o seu pedido.</p>
+                            </div>
+                            <button class="btn-ver-orc-pdf" onclick="abrirModalVerOrcamento(${p.id})">
+                                🖨️ Ver Proposta Timbrada / PDF
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <!-- Canais de Comunicação Direta & Ações -->
+                    <div class="canais-contacto-box">
+                        <div class="canais-titulo">
+                            <span>⚡ Contactar ${p.prestador_nome} diretamente:</span>
+                        </div>
+                        <div class="botoes-comunicacao">
+                            ${tel ? `
+                                <a href="${linkWhatsApp}" target="_blank" rel="noopener" class="btn-acao-com btn-com-whatsapp" title="Falar no WhatsApp">
+                                    <span>💬</span> WhatsApp
+                                </a>
+                                <a href="${linkChamada}" class="btn-acao-com btn-com-chamada" title="Ligar agora">
+                                    <span>📞</span> Ligar (${ContactUtils.formatarExibicao(tel)})
+                                </a>
+                                <a href="${linkSMS}" class="btn-acao-com btn-com-sms" title="Enviar SMS">
+                                    <span>✉️</span> SMS
+                                </a>
+                            ` : `
+                                <span style="font-size:.82rem;color:#e67e22;">⚠️ Agência sem telefone cadastrado.</span>
+                            `}
+
+                            ${emailPrestador ? `
+                                <a href="mailto:${emailPrestador}?subject=Contacto%20-%20${encodeURIComponent(p.servico_nome)}" class="btn-acao-com btn-com-email">
+                                    <span>📧</span> Email
+                                </a>
+                            ` : ''}
+
+                            ${(p.estado === 'confirmado' || p.estado === 'concluido') ? `
+                                <button class="btn-avaliar-servico" onclick="abrirModalAvaliacao(${p.id}, ${p.servico_id}, ${p.prestador_id})">
+                                    ⭐ Avaliar Atendimento
+                                </button>
+                            ` : ''}
+
+                            ${p.estado === 'pendente' ? `
+                                <button class="btn-cancelar-ped" onclick="cancelarPedido(${p.id})">
+                                    ✕ Cancelar pedido
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+async function cancelarPedido(id) {
+    if (!confirm('Tem a certeza de que deseja cancelar este pedido de contacto?')) return;
+    try {
+        await api.pedidos.cancelar(id);
+        mostrarToast('Pedido cancelado.');
+        carregarMeusPedidos();
+    } catch (e) {
+        mostrarToast('Erro ao cancelar pedido: ' + e.message, 'erro');
+    }
+}
+
+/* ══════════════════════════════════════════
+   VISUALIZADOR DE ORÇAMENTO FORMAL
+══════════════════════════════════════════ */
+let orcamentoVisualizado = null;
+
+function abrirModalVerOrcamento(pedidoId) {
+    const p = meusPedidos.find(x => x.id === pedidoId);
+    if (!p) return;
+    orcamentoVisualizado = p;
+
+    let det = p.detalhes_orcamento;
+    if (typeof det === 'string') {
+        try { det = JSON.parse(det); } catch (_) { det = {}; }
+    }
+    det = det || {};
+
+    const baseNome  = det.servico_base_nome || p.servico_nome;
+    const baseValor = det.servico_base_valor || p.servico_preco || 0;
+    const extras    = det.itens_extra || [];
+    const obs       = det.observacoes || 'Proposta de prestação de serviços funerários emitida com total transparência e rigor.';
+    const total     = p.valor_orcamento || (baseValor + extras.reduce((acc, it) => acc + (it.valor || 0), 0));
+
+    const html = `
+        <div style="border-bottom:2px solid #2c3e50;padding-bottom:1rem;margin-bottom:1rem;display:flex;justify-content:space-between;align-items:flex-start;">
+            <div>
+                <h2 style="font-family:var(--fonte-titulo);font-size:1.35rem;color:#1a252f;margin-bottom:.2rem;">✝ ${p.prestador_nome}</h2>
+                <div style="font-size:.82rem;color:#666;">
+                    📍 ${p.prestador_cidade || 'Portugal'}<br />
+                    📞 Piquete: ${p.prestador_telefone || 'Disponível'}
+                </div>
+            </div>
+            <div style="text-align:right;font-size:.82rem;color:#666;">
+                <strong style="color:#1a252f;font-size:1rem;display:block;">ORÇAMENTO #${p.id}</strong>
+                Data: ${formatarData(p.criado_em)}<br />
+                Cliente: <strong>${utilizador.nome}</strong>
+            </div>
+        </div>
+
+        <table style="width:100%;border-collapse:collapse;margin:1rem 0;font-size:.88rem;">
+            <thead>
+                <tr style="background:#f8f9fa;border-bottom:2px solid #dee2e6;">
+                    <th style="padding:.65rem;text-align:left;">Item / Serviço</th>
+                    <th style="padding:.65rem;text-align:right;">Valor (€)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr style="border-bottom:1px solid #eee;">
+                    <td style="padding:.65rem;"><strong>${baseNome}</strong> (Serviço Base)</td>
+                    <td style="padding:.65rem;text-align:right;">${formatarPreco(baseValor)}</td>
+                </tr>
+                ${extras.map(it => `
+                    <tr style="border-bottom:1px solid #eee;">
+                        <td style="padding:.65rem;">${it.nome}</td>
+                        <td style="padding:.65rem;text-align:right;">${formatarPreco(it.valor)}</td>
+                    </tr>
+                `).join('')}
+                <tr style="border-top:2px solid #2c3e50;font-weight:700;font-size:1.05rem;">
+                    <td style="padding:.75rem;color:#1a252f;">TOTAL ESTIMADO</td>
+                    <td style="padding:.75rem;text-align:right;color:#1a252f;">${formatarPreco(total)}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div style="background:#fcfbf9;border-left:3px solid var(--dourado);padding:.85rem 1rem;border-radius:6px;font-size:.82rem;color:#555;margin-top:1rem;">
+            <strong>Observações da Agência:</strong><br />
+            ${obs}
+        </div>
+    `;
+
+    document.getElementById('orc-conteudo-modal').innerHTML = html;
+    abrirModal('modal-ver-orcamento');
+}
+
+function imprimirOrcamentoCliente() {
+    const p = orcamentoVisualizado;
+    if (!p) return;
+
+    const modalHtml = document.getElementById('orc-conteudo-modal').innerHTML;
+    const printDiv = document.getElementById('printable-orcamento-cli');
+    printDiv.style.display = 'block';
+    printDiv.innerHTML = `
+        <div style="padding:2rem;font-family:'Segoe UI',Arial,sans-serif;color:#222;background:#fff;">
+            ${modalHtml}
+            <div style="margin-top:3.5rem;display:flex;justify-content:space-between;padding:0 2rem;text-align:center;font-size:.8rem;color:#777;">
+                <div style="border-top:1px solid #ccc;padding-top:.5rem;width:200px;">Assinatura da Agência</div>
+                <div style="border-top:1px solid #ccc;padding-top:.5rem;width:200px;">Assinatura do Cliente</div>
+            </div>
+        </div>
+    `;
+
+    window.print();
+}
+
+/* ══════════════════════════════════════════
+   SISTEMA DE AVALIAÇÕES (RATING & REVIEWS)
+══════════════════════════════════════════ */
+const descricoesRating = {
+    1: 'Muito Fraco (1/5)',
+    2: 'Razoável (2/5)',
+    3: 'Bom (3/5)',
+    4: 'Muito Bom (4/5)',
+    5: 'Excelente (5/5)'
+};
+
+function abrirModalAvaliacao(pedidoId, servicoId, prestadorId) {
+    document.getElementById('form-avaliacao').reset();
+    document.getElementById('av-pedido-id').value    = pedidoId;
+    document.getElementById('av-servico-id').value   = servicoId;
+    document.getElementById('av-prestador-id').value = prestadorId;
+    definirRating(5);
+    abrirModal('modal-avaliacao');
+}
+
+function definirRating(valor) {
+    document.getElementById('av-rating-valor').value = valor;
+    document.querySelectorAll('.estrela-item').forEach(el => {
+        const v = parseInt(el.getAttribute('data-v'));
+        if (v <= valor) {
+            el.classList.add('selecionada');
+        } else {
+            el.classList.remove('selecionada');
+        }
+    });
+    document.getElementById('rating-texto-desc').textContent = descricoesRating[valor] || `${valor}/5`;
+}
+
+async function submeterAvaliacao(e) {
+    e.preventDefault();
+    const payload = {
+        pedido_id:     document.getElementById('av-pedido-id').value,
+        servico_id:    document.getElementById('av-servico-id').value,
+        prestador_id:  document.getElementById('av-prestador-id').value,
+        classificacao: parseInt(document.getElementById('av-rating-valor').value),
+        comentario:    document.getElementById('av-comentario').value
+    };
+
+    try {
+        await api.avaliacoes.criar(payload);
+        mostrarToast('Avaliação registada com sucesso! Muito obrigado pelo testemunho.');
+        fecharModal('modal-avaliacao');
+    } catch (err) {
+        mostrarToast('Erro: ' + err.message, 'erro');
+    }
+}
+
+/* ══════════════════════════════════════════
+   TAB 2: AGÊNCIAS CERTIFICADAS
+══════════════════════════════════════════ */
+let todosPrestadores = [];
+
+async function carregarPrestadores() {
+    try {
+        const res = await api.prestadores.listar();
+        todosPrestadores = res.dados || [];
+        document.getElementById('st-prestadores').textContent = todosPrestadores.length;
+        renderizarPrestadores(todosPrestadores);
+    } catch (e) {
+        mostrarToast('Erro ao carregar agências.', 'erro');
+    }
+}
+
+function filtrarPrestadores() {
+    const termo = (document.getElementById('input-busca-prestador')?.value || '').toLowerCase();
+    const filtrados = todosPrestadores.filter(p =>
+        (p.nome || '').toLowerCase().includes(termo) ||
+        (p.cidade || '').toLowerCase().includes(termo) ||
+        (p.areas_atuacao || '').toLowerCase().includes(termo)
+    );
+    renderizarPrestadores(filtrados);
+}
+
+function renderizarPrestadores(lista) {
+    const el = document.getElementById('grid-prestadores-cliente');
+    if (!lista.length) {
+        el.innerHTML = '<div class="vazio"><div class="vi">🔍</div><p>Nenhuma agência encontrada.</p></div>';
+        return;
+    }
+
+    const clienteNome = utilizador.nome || 'Cliente';
+
+    el.innerHTML = lista.map(p => {
+        const tel = p.telefone || '';
+        const logoStyle = p.logo_url ? `background-image:url('${p.logo_url}');background-size:cover;background-position:center;color:transparent;` : '';
+        const inicial = (p.nome || '?').charAt(0).toUpperCase();
+        const msgWhats = `Olá ${p.nome}, sou o(a) ${clienteNome}. Encontrei a vossa agência na Plataforma Funerária e gostaria de solicitar informações.`;
+        const msgSMS   = `Olá ${p.nome}, sou ${clienteNome} e gostaria de informações sobre serviços funerários.`;
+
+        const linkWhatsApp = ContactUtils.linkWhatsApp(tel, msgWhats);
+        const linkChamada  = ContactUtils.linkChamada(tel);
+        const linkSMS      = ContactUtils.linkSMS(tel, msgSMS);
+
+        return `
+            <div class="prestador-card-cli">
+                <div class="prestador-top">
+                    <div class="prestador-avatar-c" style="${logoStyle}">${p.logo_url ? '' : inicial}</div>
+                    <div class="prestador-info-c">
+                        <h3>${p.nome}</h3>
+                        <p>📍 ${p.cidade || 'Portugal'} ${p.nif ? `· NIF: ${p.nif}` : ''}</p>
+                    </div>
+                </div>
+
+                ${p.horario ? `<div style="font-size:.78rem;color:#92660a;background:#fef9ec;padding:.2rem .6rem;border-radius:50px;display:inline-block;border:1px solid #f5e4a0;font-weight:600;align-self:flex-start;">🕒 ${p.horario}</div>` : ''}
+                ${p.areas_atuacao ? `<div style="font-size:.8rem;color:#555;"><strong>Áreas:</strong> ${p.areas_atuacao}</div>` : ''}
+
+                <div style="font-size:.84rem;color:var(--cor-texto-leve);">
+                    ${tel ? `📞 <strong>${ContactUtils.formatarExibicao(tel)}</strong>` : 'Telefone não disponível'}
+                </div>
+
+                <div class="botoes-comunicacao" style="margin-top:auto;">
+                    ${tel ? `
+                        <a href="${linkWhatsApp}" target="_blank" rel="noopener" class="btn-acao-com btn-com-whatsapp" title="WhatsApp">
+                            <span>💬</span> WhatsApp
+                        </a>
+                        <a href="${linkChamada}" class="btn-acao-com btn-com-chamada" title="Ligar">
+                            <span>📞</span> Ligar
+                        </a>
+                        <a href="${linkSMS}" class="btn-acao-com btn-com-sms" title="SMS">
+                            <span>✉️</span> SMS
+                        </a>
+                    ` : ''}
+                    <a href="../index.html" class="btn-acao-com btn-com-email" style="margin-left:auto;">
+                        Ver catálogo →
+                    </a>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+/* ══════════════════════════════════════════
+   TAB 4: PERFIL
+══════════════════════════════════════════ */
+async function carregarPerfil() {
+    try {
+        const res = await api.auth.perfil();
+        const u   = res.utilizador;
+        document.getElementById('pf-telefone').value = u.telefone || '';
+        document.getElementById('pf-cidade').value   = u.cidade   || '';
+    } catch (_) {}
+}
+
+async function guardarPerfil() {
+    const btn = document.getElementById('btn-pf-txt');
+    btn.textContent = 'A guardar…';
+    try {
+        await api.put(`/clientes/${utilizador.id}`, {
+            nome:     document.getElementById('pf-nome').value,
+            telefone: document.getElementById('pf-telefone').value,
+            cidade:   document.getElementById('pf-cidade').value,
+        });
+        mostrarToast('Perfil actualizado com sucesso!');
+        const novoNome = document.getElementById('pf-nome').value;
+        utilizador.nome = novoNome;
+        Auth.guardarUtilizador(utilizador);
+        document.getElementById('pf-nome-h').textContent  = novoNome;
+        document.getElementById('nav-nome').textContent   = novoNome.split(' ')[0];
+        document.getElementById('hero-nome').textContent  = novoNome.split(' ')[0];
+    } catch (e) {
+        mostrarToast(e.message, 'erro');
+    }
+    btn.textContent = 'Guardar alterações';
+}
+
+/* ══════════════════════════════════════════
+   MODAIS AUXILIARES
+══════════════════════════════════════════ */
+function abrirModal(id) {
+    document.getElementById(id).classList.add('aberto');
+}
+function fecharModal(id) {
+    document.getElementById(id).classList.remove('aberto');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('aberto');
+    });
+});
+
+/* ══════════════════════════════════════════
+   INICIALIZAÇÃO
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+    await Promise.all([
+        carregarMeusPedidos(),
+        carregarPrestadores()
+    ]);
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+# Dependências
+node_modules/
+*/node_modules/
+
+# Variáveis de ambiente (NUNCA enviar para o Git)
+.env
+.env.local
+.env.*.local
+backend/.env
+
+# Uploads (imagens dos serviços)
+backend/uploads/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+
+# Build
+dist/
+build/

@@ -1,0 +1,1644 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel do Prestador — Plataforma Funerária</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        body { background: #f0ede8; }
+
+        /* ══ NAVBAR ══ */
+        .painel-nav {
+            background: rgba(10,10,15,.97);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(201,168,76,.2);
+            padding: 0 2.5rem;
+            height: 68px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-logo {
+            font-family: var(--fonte-titulo);
+            font-size: 1.2rem; color: var(--branco);
+            display: flex; align-items: center; gap: .5rem;
+        }
+        .nav-logo span { color: var(--dourado); }
+        .nav-dir { display: flex; align-items: center; gap: 1.5rem; }
+        .nav-dir a { color: rgba(255,255,255,.6); font-size: .85rem; transition: color .2s; }
+        .nav-dir a:hover { color: var(--branco); }
+        .usuario-badge {
+            display: flex; align-items: center; gap: .65rem;
+            background: rgba(255,255,255,.06);
+            border: 1px solid rgba(255,255,255,.1);
+            border-radius: 50px;
+            padding: .3rem .75rem .3rem .3rem;
+        }
+        .usuario-avatar {
+            width: 34px; height: 34px;
+            background: var(--grad-dourado);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: .9rem; color: var(--preto);
+            background-size: cover; background-position: center;
+        }
+        .usuario-nome { font-size: .85rem; color: rgba(255,255,255,.8); font-weight: 500; }
+
+        /* ══ HERO ══ */
+        .painel-hero {
+            background: var(--grad-escuro);
+            padding: 2.75rem 2.5rem 2rem;
+            position: relative; overflow: hidden;
+        }
+        .painel-hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at 80% 50%, rgba(201,168,76,.08) 0%, transparent 60%);
+        }
+        .painel-hero::after {
+            content: '';
+            position: absolute; bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--dourado), transparent);
+        }
+        .hero-inner {
+            max-width: 1200px; margin: 0 auto;
+            position: relative; z-index: 1;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 1.5rem;
+        }
+        .hero-inner h1 {
+            font-family: var(--fonte-titulo);
+            font-size: 1.8rem; color: var(--branco); margin-bottom: .3rem;
+        }
+        .hero-inner h1 span { color: var(--dourado); }
+        .hero-inner p { color: rgba(255,255,255,.5); font-size: .88rem; }
+        .hero-acoes { display: flex; gap: .75rem; flex-wrap: wrap; }
+        .btn-novo-servico {
+            background: var(--grad-dourado);
+            color: var(--preto); border: none; border-radius: 50px;
+            padding: .75rem 1.6rem; font-weight: 700; font-size: .88rem;
+            cursor: pointer; transition: all .3s; white-space: nowrap;
+        }
+        .btn-novo-servico:hover { transform: translateY(-2px); box-shadow: var(--sombra-dourada); }
+        .btn-config-hero {
+            background: rgba(255,255,255,.08); color: var(--branco);
+            border: 1px solid rgba(255,255,255,.15); border-radius: 50px;
+            padding: .75rem 1.3rem; font-weight: 600; font-size: .88rem;
+            cursor: pointer; transition: all .2s;
+        }
+        .btn-config-hero:hover { background: rgba(255,255,255,.15); }
+
+        /* ══ STATS ══ */
+        .stats-row {
+            max-width: 1200px; margin: 0 auto;
+            padding: 2rem 2.5rem 0;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 1.25rem;
+        }
+        .stat-card {
+            background: var(--branco);
+            border-radius: var(--raio-lg);
+            padding: 1.3rem 1.5rem;
+            box-shadow: var(--sombra-sm);
+            display: flex; align-items: center; gap: 1rem;
+            border: 1px solid rgba(0,0,0,.04);
+            transition: box-shadow .2s;
+        }
+        .stat-card:hover { box-shadow: var(--sombra-md); }
+        .stat-icone {
+            width: 46px; height: 46px; border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.25rem; flex-shrink: 0;
+        }
+        .ic-ouro   { background: #fef9ec; }
+        .ic-verde  { background: #edfaf3; }
+        .ic-azul   { background: #edf3fb; }
+        .ic-roxo   { background: #f3edfb; }
+        .stat-info .num   { font-family: var(--fonte-titulo); font-size: 1.6rem; font-weight: 700; color: var(--cinza-escuro); line-height: 1.1; }
+        .stat-info .label { font-size: .75rem; color: var(--cor-texto-leve); margin-top: .2rem; font-weight: 500; }
+
+        /* ══ CORPO ══ */
+        .painel-corpo {
+            max-width: 1200px; margin: 0 auto;
+            padding: 2rem 2.5rem 4rem;
+        }
+
+        /* ══ TABS ══ */
+        .tabs {
+            display: flex; gap: .25rem;
+            border-bottom: 2px solid var(--cor-borda);
+            margin-bottom: 1.75rem; flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: .75rem 1.4rem;
+            border: none; background: none;
+            font-family: var(--fonte-corpo); font-size: .88rem; font-weight: 600;
+            color: var(--cor-texto-leve); cursor: pointer;
+            border-bottom: 2px solid transparent; margin-bottom: -2px;
+            transition: all .2s; display: flex; align-items: center; gap: .4rem;
+        }
+        .tab-btn:hover { color: var(--cinza-escuro); }
+        .tab-btn.activo { color: var(--cinza-escuro); border-bottom-color: var(--dourado); font-weight: 700; }
+        .tab-badge {
+            background: var(--cinza-escuro); color: var(--dourado);
+            font-size: .68rem; padding: .1rem .45rem;
+            border-radius: 50px; font-weight: 700;
+        }
+        .tab-badge.novo { background: #e74c3c; color: #fff; animation: pulse 2s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .8; transform: scale(1.1); }
+        }
+
+        .tab-pane { display: none; }
+        .tab-pane.activo { display: block; }
+
+        /* ══ FILTROS E PESQUISA DE PEDIDOS ══ */
+        .pedidos-filtro-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+        }
+        .pedidos-filtros-status { display: flex; gap: .4rem; flex-wrap: wrap; }
+        .btn-status-filtro {
+            padding: .45rem .9rem; border-radius: 50px;
+            border: 1px solid var(--cor-borda); background: var(--branco);
+            font-size: .78rem; font-weight: 600; color: var(--cor-texto-leve);
+            cursor: pointer; transition: all .2s;
+        }
+        .btn-status-filtro:hover,
+        .btn-status-filtro.activo {
+            background: var(--cinza-escuro); color: var(--branco); border-color: var(--cinza-escuro);
+        }
+        .pedidos-busca-input {
+            padding: .5rem 1rem; border: 1.5px solid var(--cor-borda);
+            border-radius: 50px; font-size: .84rem; outline: none;
+            min-width: 220px; background: var(--branco);
+        }
+        .pedidos-busca-input:focus { border-color: var(--dourado); }
+
+        /* ══ PEDIDOS CARDS ══ */
+        .pedidos-lista { display: flex; flex-direction: column; gap: 1.25rem; }
+
+        .pedido-card {
+            background: var(--branco);
+            border-radius: var(--raio-lg); box-shadow: var(--sombra-sm);
+            overflow: hidden; border: 1px solid rgba(0,0,0,.04);
+            transition: box-shadow .25s;
+        }
+        .pedido-card:hover { box-shadow: var(--sombra-md); }
+        .pedido-card.novo-pedido {
+            border-left: 4px solid var(--dourado);
+        }
+
+        .pedido-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 1.25rem 1.75rem;
+            border-bottom: 1px solid var(--cor-borda);
+            flex-wrap: wrap; gap: .75rem;
+        }
+        .pedido-esq { display: flex; align-items: center; gap: 1rem; }
+        .ped-icone {
+            width: 44px; height: 44px;
+            background: linear-gradient(135deg, var(--branco-suave), var(--cinza-claro));
+            border-radius: 12px; display: flex; align-items: center;
+            justify-content: center; font-size: 1.2rem;
+            border: 1px solid var(--cor-borda); flex-shrink: 0;
+        }
+        .ped-nome  { font-weight: 700; color: var(--cinza-escuro); font-size: .95rem; }
+        .ped-sub   { font-size: .78rem; color: var(--cor-texto-leve); margin-top: .15rem; }
+
+        .estado-badge {
+            display: inline-flex; align-items: center; gap: .3rem;
+            padding: .3rem .9rem; border-radius: 50px;
+            font-size: .75rem; font-weight: 700; letter-spacing: .2px;
+        }
+        .est-pendente  { background: #fef9ec; color: #92660a; border: 1px solid #f5e4a0; }
+        .est-confirmado{ background: #edfaf3; color: #1a6b3a; border: 1px solid #9fdfc0; }
+        .est-cancelado { background: #fef0f0; color: #8b2635; border: 1px solid #f5c0c8; }
+        .est-concluido { background: #edf3fb; color: #1a3a6b; border: 1px solid #9fc0e8; }
+
+        .pedido-corpo { padding: 1.25rem 1.75rem; }
+        .pedido-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 1.25rem; margin-bottom: 1rem;
+        }
+        .ped-detalhe label {
+            font-size: .72rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: .5px;
+            color: var(--cor-texto-leve); display: block; margin-bottom: .2rem;
+        }
+        .ped-detalhe span { font-size: .9rem; color: var(--cinza-escuro); font-weight: 500; }
+        .ped-detalhe span.preco { font-family: var(--fonte-titulo); font-size: 1.05rem; font-weight: 700; }
+
+        .ped-mensagem {
+            background: var(--branco-suave); border-radius: 8px;
+            padding: .85rem 1.1rem; font-size: .85rem;
+            color: var(--cor-texto-leve); border-left: 3px solid var(--dourado);
+            font-style: italic; margin-bottom: 1rem;
+        }
+
+        /* ── Seção de Notas Internas Privadas ── */
+        .notas-box {
+            background: #fffdf8;
+            border: 1px solid #faeecd;
+            border-radius: 10px;
+            padding: .9rem 1.1rem;
+            margin-bottom: 1rem;
+        }
+        .notas-box-header {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .5px; color: #92660a; margin-bottom: .4rem;
+        }
+        .notas-textarea {
+            width: 100%; min-height: 48px; border: 1px solid #eed695;
+            border-radius: 6px; padding: .5rem .75rem; font-size: .84rem;
+            font-family: var(--fonte-corpo); outline: none; background: #fff;
+            resize: vertical;
+        }
+        .notas-textarea:focus { border-color: var(--dourado); }
+        .btn-salvar-nota {
+            margin-top: .4rem; padding: .25rem .75rem; background: #92660a;
+            color: #fff; border: none; border-radius: 4px; font-size: .75rem;
+            font-weight: 600; cursor: pointer; float: right;
+        }
+        .btn-salvar-nota:hover { background: #735108; }
+
+        /* ── Bloco de Orçamento no Pedido ── */
+        .orcamento-resumo-box {
+            background: #f4f8fc;
+            border: 1px solid #c9e0f5;
+            border-radius: 10px;
+            padding: .85rem 1.1rem;
+            margin-bottom: 1rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .75rem;
+        }
+        .orcamento-resumo-info strong { color: #1a5276; font-size: .92rem; }
+        .orcamento-resumo-info p { font-size: .8rem; color: var(--cor-texto-leve); margin-top: .15rem; }
+
+        .pedido-acoes { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; }
+        .pedido-acoes label { font-size: .78rem; color: var(--cor-texto-leve); font-weight: 600; }
+
+        .select-estado {
+            padding: .4rem .9rem;
+            border: 1.5px solid var(--cor-borda); border-radius: 50px;
+            font-size: .82rem; font-family: var(--fonte-corpo);
+            background: var(--branco-suave); outline: none; cursor: pointer;
+            transition: border-color .2s;
+        }
+        .select-estado:focus { border-color: var(--dourado); }
+
+        .btn-atualizar {
+            padding: .4rem 1rem;
+            background: var(--cinza-escuro); color: var(--branco);
+            border: none; border-radius: 50px; font-size: .8rem;
+            font-weight: 700; cursor: pointer; transition: all .2s;
+            font-family: var(--fonte-corpo);
+        }
+        .btn-atualizar:hover { background: var(--dourado); color: var(--preto); }
+
+        .btn-ligar {
+            padding: .4rem .9rem;
+            background: none; color: var(--cinza-escuro);
+            border: 1.5px solid var(--cor-borda); border-radius: 50px;
+            font-size: .8rem; font-weight: 600; cursor: pointer;
+            transition: all .2s; font-family: var(--fonte-corpo);
+            text-decoration: none; display: inline-flex; align-items: center; gap: .3rem;
+        }
+        .btn-ligar:hover { border-color: var(--dourado); color: var(--dourado); }
+        .btn-ligar.whats { background: #25D366; color: #fff; border-color: #25D366; }
+        .btn-ligar.whats:hover { background: #1ebe5d; color: #fff; border-color: #1ebe5d; }
+        .btn-ligar.sms   { background: #007AFF; color: #fff; border-color: #007AFF; }
+        .btn-ligar.sms:hover   { background: #006ae0; color: #fff; border-color: #006ae0; }
+        .btn-orcamento-acao {
+            background: linear-gradient(135deg, #1a252f, #2c3e50);
+            color: #f1c40f; border: 1px solid #f1c40f; border-radius: 50px;
+            padding: .4rem 1rem; font-size: .8rem; font-weight: 700; cursor: pointer;
+            display: inline-flex; align-items: center; gap: .35rem; transition: all .2s;
+        }
+        .btn-orcamento-acao:hover { background: #f1c40f; color: #1a252f; }
+
+        /* ══ SERVIÇOS ══ */
+        .servicos-top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;
+        }
+        .servicos-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.35rem;
+        }
+        .servico-card {
+            background: var(--branco);
+            border-radius: var(--raio-lg); box-shadow: var(--sombra-sm);
+            overflow: hidden; border: 1px solid rgba(0,0,0,.04);
+            transition: box-shadow .2s, transform .2s; position: relative;
+            display: flex; flex-direction: column;
+        }
+        .servico-card:hover { box-shadow: var(--sombra-md); transform: translateY(-2px); }
+        .servico-img-box {
+            height: 140px; background: #2c3e50;
+            background-size: cover; background-position: center;
+            position: relative;
+        }
+        .servico-tipo-badge {
+            position: absolute; top: .75rem; left: .75rem;
+            background: rgba(10,10,15,.8); color: var(--dourado);
+            padding: .2rem .65rem; border-radius: 50px;
+            font-size: .7rem; font-weight: 700; text-transform: uppercase;
+        }
+        .servico-card-header {
+            padding: 1.1rem 1.4rem .8rem;
+            border-bottom: 1px solid var(--cor-borda);
+            display: flex; justify-content: space-between; align-items: flex-start; gap: .75rem;
+        }
+        .servico-cat-badge {
+            font-size: .7rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .8px; color: var(--dourado);
+            background: rgba(201,168,76,.1); padding: .2rem .65rem;
+            border-radius: 50px; border: 1px solid rgba(201,168,76,.2);
+        }
+        .servico-estado-badge {
+            font-size: .7rem; font-weight: 700;
+            padding: .2rem .65rem; border-radius: 50px;
+        }
+        .srv-ativo   { background: #edfaf3; color: #1a6b3a; border: 1px solid #9fdfc0; }
+        .srv-inativo { background: #fef0f0; color: #8b2635; border: 1px solid #f5c0c8; }
+        .servico-card-corpo { padding: 1.1rem 1.4rem; flex: 1; display: flex; flex-direction: column; }
+        .servico-card-corpo h3 {
+            font-family: var(--fonte-titulo); font-size: 1.05rem;
+            color: var(--cinza-escuro); margin-bottom: .4rem;
+        }
+        .servico-card-corpo p { font-size: .82rem; color: var(--cor-texto-leve); line-height: 1.5; margin-bottom: .85rem; }
+        
+        .itens-incluidos-pills {
+            display: flex; flex-wrap: wrap; gap: .35rem; margin-bottom: 1rem;
+        }
+        .item-pill {
+            background: #f5f4f0; color: #555;
+            padding: .2rem .55rem; border-radius: 4px;
+            font-size: .72rem; font-weight: 600; display: inline-flex; align-items: center; gap: .25rem;
+        }
+        .item-pill.destaque { background: #edf9f2; color: #1a6b3a; border: 1px solid #c0ebd0; }
+
+        .servico-preco-linha {
+            margin-top: auto; padding-top: .75rem;
+            display: flex; justify-content: space-between; align-items: baseline;
+        }
+        .servico-preco {
+            font-family: var(--fonte-titulo); font-size: 1.25rem;
+            font-weight: 700; color: var(--cinza-escuro);
+        }
+        .servico-card-footer {
+            padding: .9rem 1.4rem;
+            border-top: 1px solid var(--cor-borda);
+            display: flex; gap: .6rem; background: #faf9f6;
+        }
+        .btn-editar-srv {
+            flex: 1; padding: .5rem;
+            background: var(--cinza-escuro); color: var(--branco);
+            border: none; border-radius: 8px; font-size: .82rem;
+            font-weight: 600; cursor: pointer; transition: all .2s;
+            font-family: var(--fonte-corpo);
+        }
+        .btn-editar-srv:hover { background: var(--dourado); color: var(--preto); }
+        .btn-apagar-srv {
+            padding: .5rem .9rem;
+            background: none; color: var(--cor-texto-leve);
+            border: 1.5px solid var(--cor-borda); border-radius: 8px;
+            font-size: .82rem; cursor: pointer; transition: all .2s;
+            font-family: var(--fonte-corpo);
+        }
+        .btn-apagar-srv:hover { border-color: #e74c3c; color: #e74c3c; }
+
+        /* ══ PERFIL DA AGÊNCIA ══ */
+        .perfil-card {
+            background: var(--branco); border-radius: var(--raio-lg);
+            box-shadow: var(--sombra-sm); overflow: hidden; max-width: 800px;
+        }
+        .perfil-hero-bar {
+            background: var(--grad-escuro); padding: 2rem;
+            display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap;
+        }
+        .perfil-av {
+            width: 72px; height: 72px;
+            background: var(--grad-dourado); border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-family: var(--fonte-titulo); font-size: 1.8rem;
+            font-weight: 700; color: var(--preto); flex-shrink: 0;
+            background-size: cover; background-position: center;
+            border: 2px solid rgba(201,168,76,.4);
+        }
+        .perfil-hero-bar .pnome  { font-family: var(--fonte-titulo); font-size: 1.3rem; color: var(--branco); }
+        .perfil-hero-bar .pemail { font-size: .85rem; color: rgba(255,255,255,.5); margin-top: .2rem; }
+        .perfil-corpo { padding: 2rem; }
+        .perfil-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .pf-grupo { margin-bottom: 1.2rem; }
+        .pf-grupo label {
+            font-size: .73rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .6px; color: var(--cor-texto-leve); display: block; margin-bottom: .4rem;
+        }
+        .pf-grupo input,
+        .pf-grupo textarea,
+        .pf-grupo select {
+            width: 100%; padding: .75rem 1rem;
+            border: 1.5px solid var(--cor-borda); border-radius: 10px;
+            font-size: .9rem; font-family: var(--fonte-corpo); outline: none;
+            background: var(--branco-suave); transition: border-color .2s, box-shadow .2s;
+        }
+        .pf-grupo input:focus,
+        .pf-grupo textarea:focus,
+        .pf-grupo select:focus {
+            border-color: var(--dourado); background: var(--branco);
+            box-shadow: 0 0 0 3px rgba(201,168,76,.1);
+        }
+        .pf-grupo input:disabled { opacity: .5; cursor: not-allowed; }
+        .pf-grupo textarea { min-height: 90px; resize: vertical; }
+        .btn-atalho-horario {
+            display: inline-block; margin-top: .4rem; font-size: .75rem;
+            color: #92660a; background: #fef9ec; padding: .25rem .65rem;
+            border-radius: 50px; cursor: pointer; border: 1px solid #f5e4a0; font-weight: 600;
+        }
+        .btn-atalho-horario:hover { background: #f9eed0; }
+
+        .btn-guardar-pf {
+            width: 100%; padding: .9rem;
+            background: var(--cinza-escuro); color: var(--branco);
+            border: none; border-radius: 10px; font-size: .95rem;
+            font-weight: 700; cursor: pointer; transition: all .25s;
+            font-family: var(--fonte-corpo); margin-top: .5rem;
+            position: relative; overflow: hidden;
+        }
+        .btn-guardar-pf::before {
+            content: ''; position: absolute; inset: 0;
+            background: var(--grad-dourado); opacity: 0; transition: opacity .3s;
+        }
+        .btn-guardar-pf:hover::before { opacity: 1; }
+        .btn-guardar-pf:hover { color: var(--preto); }
+        .btn-guardar-pf span { position: relative; z-index: 1; }
+
+        /* ══ MODAL DE SERVIÇO & ORÇAMENTO ══ */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.6); z-index: 300;
+            display: none; align-items: center; justify-content: center;
+            padding: 1.5rem;
+        }
+        .modal-overlay.aberto { display: flex; }
+        .modal-box {
+            background: var(--branco); border-radius: var(--raio-lg);
+            padding: 2.25rem; max-width: 650px; width: 100%;
+            max-height: 90vh; overflow-y: auto;
+            box-shadow: 0 30px 80px rgba(0,0,0,.35);
+            border-top: 4px solid var(--dourado);
+            animation: fadeUp .3s ease both;
+        }
+        .modal-box h3 {
+            font-family: var(--fonte-titulo); font-size: 1.25rem;
+            color: var(--cinza-escuro); margin-bottom: 1.5rem;
+        }
+        .modal-grupo { margin-bottom: 1.1rem; }
+        .modal-grupo label {
+            font-size: .75rem; font-weight: 700; text-transform: uppercase;
+            letter-spacing: .6px; color: var(--cor-texto-leve); display: block; margin-bottom: .35rem;
+        }
+        .modal-grupo input,
+        .modal-grupo select,
+        .modal-grupo textarea {
+            width: 100%; padding: .7rem 1rem;
+            border: 1.5px solid var(--cor-borda); border-radius: 10px;
+            font-size: .9rem; font-family: var(--fonte-corpo); outline: none;
+            background: var(--branco-suave); transition: border-color .2s;
+        }
+        .modal-grupo input:focus,
+        .modal-grupo select:focus,
+        .modal-grupo textarea:focus {
+            border-color: var(--dourado); background: var(--branco);
+        }
+        .modal-grupo textarea { resize: vertical; min-height: 75px; }
+        .modal-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .modal-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+
+        /* Checklist seletora de itens incluídos no modal */
+        .seletor-itens-grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: .5rem; margin-top: .4rem; max-height: 160px; overflow-y: auto;
+            background: #faf8f5; padding: .75rem; border-radius: 8px; border: 1px solid var(--cor-borda);
+        }
+        .item-chk-label {
+            display: flex; align-items: center; gap: .45rem;
+            font-size: .8rem; color: var(--cinza-escuro); cursor: pointer;
+        }
+
+        .modal-acoes { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.5rem; }
+        .btn-modal-cancel {
+            padding: .65rem 1.3rem; border: 1.5px solid var(--cor-borda);
+            border-radius: 50px; background: none; cursor: pointer;
+            font-size: .88rem; font-family: var(--fonte-corpo);
+        }
+        .btn-modal-ok {
+            padding: .65rem 1.6rem; background: var(--cinza-escuro);
+            color: var(--branco); border: none; border-radius: 50px;
+            font-size: .88rem; font-weight: 700; cursor: pointer;
+            transition: all .2s; font-family: var(--fonte-corpo);
+        }
+        .btn-modal-ok:hover { background: var(--dourado); color: var(--preto); }
+
+        /* ══ FOLHA TIMBRADA DE ORÇAMENTO (IMPRESSÃO / PDF) ══ */
+        .folha-orcamento-view {
+            background: #fff; padding: 2rem; border-radius: 12px;
+            border: 1px solid var(--cor-borda); box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            font-family: 'Segoe UI', Arial, sans-serif; color: #222;
+        }
+        .orc-header { display: flex; justify-content: space-between; border-bottom: 2px solid #2c3e50; padding-bottom: 1.25rem; margin-bottom: 1.5rem; }
+        .orc-logo-txt { font-family: var(--fonte-titulo); font-size: 1.4rem; font-weight: 700; color: #1a252f; }
+        .orc-meta { font-size: .82rem; color: #666; text-align: right; }
+        .orc-tabela { width: 100%; border-collapse: collapse; margin: 1.5rem 0; font-size: .88rem; }
+        .orc-tabela th { background: #f8f9fa; padding: .65rem; text-align: left; border-bottom: 2px solid #dee2e6; }
+        .orc-tabela td { padding: .65rem; border-bottom: 1px solid #eee; }
+        .orc-total-row td { font-weight: 700; font-size: 1.05rem; border-top: 2px solid #2c3e50; color: #1a252f; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #printable-orcamento, #printable-orcamento * { visibility: visible; }
+            #printable-orcamento { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+
+        /* ══ VAZIO ══ */
+        .vazio {
+            text-align: center; padding: 4rem 2rem; color: var(--cor-texto-leve);
+        }
+        .vazio .vi { font-size: 3.5rem; margin-bottom: 1rem; opacity: .4; }
+        .vazio h3  { font-family: var(--fonte-titulo); font-size: 1.2rem; color: var(--cinza-escuro); margin-bottom: .5rem; }
+        .vazio p   { font-size: .88rem; }
+
+        /* ══ NOTIFICAÇÃO PEDIDO NOVO ══ */
+        .notif-bar {
+            background: linear-gradient(135deg, #1a1a2e, #2d2d44);
+            border-bottom: 1px solid rgba(201,168,76,.25);
+            padding: .75rem 2.5rem;
+            display: none; align-items: center; justify-content: space-between;
+            gap: 1rem;
+        }
+        .notif-bar.visivel { display: flex; }
+        .notif-bar span { color: rgba(255,255,255,.8); font-size: .85rem; }
+        .notif-bar strong { color: var(--dourado); }
+        .notif-bar button {
+            background: var(--grad-dourado); color: var(--preto);
+            border: none; border-radius: 50px; padding: .35rem .9rem;
+            font-size: .78rem; font-weight: 700; cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            .painel-nav  { padding: 0 1.25rem; }
+            .painel-hero { padding: 2rem 1.25rem 1.5rem; }
+            .stats-row   { padding: 1.5rem 1.25rem 0; }
+            .painel-corpo{ padding: 1.5rem 1.25rem 3rem; }
+            .servicos-grid { grid-template-columns: 1fr; }
+            .perfil-grid-2, .modal-grid-2, .modal-grid-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ══ NAVBAR ══ -->
+<nav class="painel-nav">
+    <div class="nav-logo">✝ Plataforma <span>Funerária</span></div>
+    <div class="nav-dir">
+        <a href="../index.html" target="_blank">Ver site</a>
+        <div class="usuario-badge">
+            <div class="usuario-avatar" id="nav-avatar">?</div>
+            <span class="usuario-nome" id="nav-nome">—</span>
+        </div>
+        <a href="#" onclick="Auth.terminarSessao()" style="color:rgba(255,255,255,.35);font-size:.8rem;">Sair</a>
+    </div>
+</nav>
+
+<!-- Barra de notificação de pedidos novos -->
+<div class="notif-bar" id="notif-bar">
+    <span>🔔 Tem <strong id="notif-count">0</strong> novo(s) pedido(s) pendente(s)</span>
+    <button onclick="mudarTab('pedidos', document.getElementById('tab-btn-pedidos'))">
+        Ver pedidos →
+    </button>
+</div>
+
+<!-- ══ HERO ══ -->
+<div class="painel-hero">
+    <div class="hero-inner">
+        <div>
+            <h1>Bem-vindo, <span id="hero-nome">—</span></h1>
+            <p>Gerencie os seus serviços, emita orçamentos e responda aos pedidos das famílias em tempo real</p>
+        </div>
+        <div class="hero-acoes">
+            <button class="btn-novo-servico" onclick="abrirModalServico()">
+                + Novo serviço
+            </button>
+            <button class="btn-config-hero" onclick="mudarTab('perfil', document.getElementById('tab-btn-perfil'))">
+                ⚙️ Dados da Agência
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══ STATS ══ -->
+<div class="stats-row">
+    <div class="stat-card">
+        <div class="stat-icone ic-ouro">💶</div>
+        <div class="stat-info">
+            <div class="num" id="st-faturacao">€ 0,00</div>
+            <div class="label">Total Faturado / Acordado</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icone ic-azul">📨</div>
+        <div class="stat-info">
+            <div class="num" id="st-pedidos">—</div>
+            <div class="label">Pedidos recebidos</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icone ic-verde">⏳</div>
+        <div class="stat-info">
+            <div class="num" id="st-pendentes">—</div>
+            <div class="label">Pendentes</div>
+        </div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icone ic-roxo">📋</div>
+        <div class="stat-info">
+            <div class="num" id="st-servicos">—</div>
+            <div class="label">Serviços ativos</div>
+        </div>
+    </div>
+</div>
+
+<!-- ══ CORPO ══ -->
+<div class="painel-corpo">
+
+    <div class="tabs">
+        <button class="tab-btn activo" id="tab-btn-pedidos" onclick="mudarTab('pedidos', this)">
+            📨 Pedidos & Famílias
+            <span class="tab-badge" id="badge-pedidos">0</span>
+        </button>
+        <button class="tab-btn" id="tab-btn-servicos" onclick="mudarTab('servicos', this)">
+            📋 Os meus serviços & pacotes
+            <span class="tab-badge" id="badge-servicos">0</span>
+        </button>
+        <button class="tab-btn" id="tab-btn-perfil" onclick="mudarTab('perfil', this)">
+            🏢 Perfil da Agência
+        </button>
+    </div>
+
+    <!-- ══ TAB 1: PEDIDOS ══ -->
+    <div id="tab-pedidos" class="tab-pane activo">
+        <div class="pedidos-filtro-bar">
+            <div class="pedidos-filtros-status">
+                <button class="btn-status-filtro activo" onclick="filtrarPedidosPorEstado('todos', this)">Todos</button>
+                <button class="btn-status-filtro" onclick="filtrarPedidosPorEstado('pendente', this)">⏳ Pendentes</button>
+                <button class="btn-status-filtro" onclick="filtrarPedidosPorEstado('confirmado', this)">✅ Confirmados</button>
+                <button class="btn-status-filtro" onclick="filtrarPedidosPorEstado('concluido', this)">🏁 Concluídos</button>
+                <button class="btn-status-filtro" onclick="filtrarPedidosPorEstado('cancelado', this)">✕ Cancelados</button>
+            </div>
+            <input type="text" id="busca-pedidos" class="pedidos-busca-input" placeholder="🔍 Pesquisar por cliente…" oninput="filtrarPedidosTexto()" />
+        </div>
+        <div id="lista-pedidos" class="pedidos-lista">
+            <div class="vazio"><div class="vi">⏳</div><p>A carregar pedidos…</p></div>
+        </div>
+    </div>
+
+    <!-- ══ TAB 2: SERVIÇOS ══ -->
+    <div id="tab-servicos" class="tab-pane">
+        <div class="servicos-top-bar">
+            <input type="text" id="busca-servicos-inp" class="pedidos-busca-input" placeholder="🔍 Pesquisar serviços…" oninput="filtrarServicosTexto()" />
+            <button class="btn-novo-servico" onclick="abrirModalServico()">+ Criar Novo Serviço</button>
+        </div>
+        <div id="grelha-servicos" class="servicos-grid">
+            <div class="vazio"><div class="vi">⏳</div><p>A carregar serviços…</p></div>
+        </div>
+    </div>
+
+    <!-- ══ TAB 3: PERFIL DA AGÊNCIA ══ -->
+    <div id="tab-perfil" class="tab-pane">
+        <div class="perfil-card">
+            <div class="perfil-hero-bar">
+                <div class="perfil-av" id="pf-av">?</div>
+                <div>
+                    <div class="pnome"  id="pf-nome-h">—</div>
+                    <div class="pemail" id="pf-email-h">—</div>
+                </div>
+            </div>
+            <div class="perfil-corpo">
+                <div class="perfil-grid-2">
+                    <div class="pf-grupo">
+                        <label>Nome da Agência / Empresa *</label>
+                        <input type="text" id="pf-nome" required />
+                    </div>
+                    <div class="pf-grupo">
+                        <label>NIF / NIPC da Empresa</label>
+                        <input type="text" id="pf-nif" placeholder="Ex: 509123456" />
+                    </div>
+                </div>
+
+                <div class="perfil-grid-2">
+                    <div class="pf-grupo">
+                        <label>Email de Acesso (fixo)</label>
+                        <input type="email" id="pf-email" disabled />
+                    </div>
+                    <div class="pf-grupo">
+                        <label>Telefone / Piquete 24h *</label>
+                        <input type="tel" id="pf-telefone" placeholder="Ex: 912 345 678" />
+                    </div>
+                </div>
+
+                <div class="perfil-grid-2">
+                    <div class="pf-grupo">
+                        <label>Cidade / Sede *</label>
+                        <input type="text" id="pf-cidade" placeholder="Ex: Lisboa" />
+                    </div>
+                    <div class="pf-grupo">
+                        <label>Morada Completa</label>
+                        <input type="text" id="pf-morada" placeholder="Ex: Av. da Liberdade, 100" />
+                    </div>
+                </div>
+
+                <div class="pf-grupo">
+                    <label>Horário de Atendimento</label>
+                    <input type="text" id="pf-horario" placeholder="Ex: Piquete 24h / 7 dias por semana" />
+                    <span class="btn-atalho-horario" onclick="definirHorario24h()">⚡ Preencher 'Piquete 24h / 7 dias por semana'</span>
+                </div>
+
+                <div class="pf-grupo">
+                    <label>Áreas / Concelhos de Atuação</label>
+                    <input type="text" id="pf-areas" placeholder="Ex: Lisboa, Sintra, Cascais, Loures, Almada, Setúbal" />
+                </div>
+
+                <div class="perfil-grid-2">
+                    <div class="pf-grupo">
+                        <label>URL do Logótipo / Imagem</label>
+                        <input type="url" id="pf-logo" placeholder="https://exemplo.com/logo.jpg" oninput="atualizarPreviewLogo()" />
+                    </div>
+                    <div class="pf-grupo">
+                        <label>Website Oficial</label>
+                        <input type="url" id="pf-website" placeholder="https://funerariacosta.pt" />
+                    </div>
+                </div>
+
+                <div class="pf-grupo">
+                    <label>Sobre a Agência / Apresentação</label>
+                    <textarea id="pf-descricao" placeholder="Apresente a sua agência, história, compromisso de respeito, certificações e serviços prestados..."></textarea>
+                </div>
+
+                <button class="btn-guardar-pf" onclick="guardarPerfil()">
+                    <span id="btn-pf-txt">Guardar alterações da agência</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+</div><!-- /painel-corpo -->
+
+<!-- ══ MODAL DE SERVIÇO / PACOTE ══ -->
+<div class="modal-overlay" id="modal-srv">
+    <div class="modal-box">
+        <h3 id="modal-srv-titulo">Novo serviço</h3>
+        <form id="form-servico">
+            <input type="hidden" id="srv-id" />
+            <div class="modal-grupo">
+                <label>Nome do serviço / pacote *</label>
+                <input type="text" id="srv-nome" required placeholder="Ex: Funeral Completo com Sepultura ou Cremação" />
+            </div>
+
+            <div class="modal-grid-3">
+                <div class="modal-grupo">
+                    <label>Categoria *</label>
+                    <select id="srv-categoria" required>
+                        <option value="">Selecionar…</option>
+                        <option>Funeral</option>
+                        <option>Cremação</option>
+                        <option>Transporte</option>
+                        <option>Urna</option>
+                        <option>Flores</option>
+                        <option>Outro</option>
+                    </select>
+                </div>
+                <div class="modal-grupo">
+                    <label>Tipo de Serviço</label>
+                    <select id="srv-tipo">
+                        <option value="pacote">Pacote Completo</option>
+                        <option value="base">Serviço Base</option>
+                        <option value="personalizado">Personalizado</option>
+                    </select>
+                </div>
+                <div class="modal-grupo">
+                    <label>Preço (€) *</label>
+                    <input type="number" id="srv-preco" required min="0" step="0.01" placeholder="0.00" />
+                </div>
+            </div>
+
+            <div class="modal-grid-2">
+                <div class="modal-grupo">
+                    <label>Duração aproximada (horas)</label>
+                    <input type="number" id="srv-duracao" min="1" placeholder="Ex: 3" />
+                </div>
+                <div class="modal-grupo">
+                    <label>URL da Imagem / Foto</label>
+                    <input type="url" id="srv-imagem" placeholder="https://exemplo.com/urna.jpg" />
+                </div>
+            </div>
+
+            <div class="modal-grupo">
+                <label>Itens Incluídos no Pacote</label>
+                <div class="seletor-itens-grid">
+                    <label class="item-chk-label"><input type="checkbox" value="Urna em madeira" class="chk-item"> ⚰️ Urna em madeira</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Tanatopraxia / Preparação" class="chk-item"> 🧴 Tanatopraxia</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Viatura de cortejo funerário" class="chk-item"> 🚗 Viatura de cortejo</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Registo Civil e Certidões" class="chk-item"> 📑 Registo civil & atos</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Capela ardente / Velório" class="chk-item"> 🕯️ Capela ardente</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Coroa / Arranjo floral" class="chk-item"> 🌹 Arranjo floral</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Urna cinerária (cremação)" class="chk-item"> 🏺 Urna cinerária</label>
+                    <label class="item-chk-label"><input type="checkbox" value="Apoio e tramitação 24h" class="chk-item"> ⏱️ Apoio 24h</label>
+                </div>
+                <input type="text" id="srv-itens-extra" placeholder="Outros itens separados por vírgula (ex: Livro de condolências, Água e café)" style="margin-top:.4rem;" />
+            </div>
+
+            <div class="modal-grupo">
+                <label>Descrição detalhada</label>
+                <textarea id="srv-descricao" placeholder="Descreva os detalhes do serviço, procedimentos e atendimento..."></textarea>
+            </div>
+
+            <div class="modal-grupo" id="grp-estado-srv" style="display:none;">
+                <label>Estado</label>
+                <select id="srv-estado">
+                    <option value="ativo">Activo (visível no catálogo)</option>
+                    <option value="inativo">Inactivo</option>
+                </select>
+            </div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-modal-cancel" onclick="fecharModal('modal-srv')">Cancelar</button>
+                <button type="submit" class="btn-modal-ok">Guardar serviço</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- ══ MODAL DE ORÇAMENTO FORMAL ══ -->
+<div class="modal-overlay" id="modal-orcamento">
+    <div class="modal-box" style="max-width:700px;">
+        <h3>📄 Emitir Orçamento Formal</h3>
+        <div id="orc-detalhe-pedido-info" style="font-size:.85rem;background:#fbfaf8;padding:.75rem 1rem;border-radius:8px;margin-bottom:1rem;">
+            <!-- Preenchido dinamicamente -->
+        </div>
+
+        <form id="form-orcamento" onsubmit="guardarEImprimirOrcamento(event)">
+            <input type="hidden" id="orc-pedido-id" />
+            <input type="hidden" id="orc-cliente-nome" />
+
+            <div class="modal-grupo">
+                <label>Serviço Principal & Valor Base (€)</label>
+                <div class="modal-grid-2">
+                    <input type="text" id="orc-servico-nome" readonly />
+                    <input type="number" id="orc-valor-base" step="0.01" oninput="calcularTotalOrcamento()" required />
+                </div>
+            </div>
+
+            <div class="modal-grupo">
+                <label>Itens e Suplementos Adicionais</label>
+                <div id="orc-itens-container">
+                    <!-- Linhas dinâmicas -->
+                </div>
+                <button type="button" class="btn-atalho-horario" onclick="adicionarLinhaOrcamento()" style="margin-top:.4rem;">+ Adicionar item extra (ex: Flores, Viatura extra)</button>
+            </div>
+
+            <div class="modal-grupo">
+                <label>Observações & Condições de Pagamento</label>
+                <textarea id="orc-obs" placeholder="Ex: Proposta válida por 15 dias. Pagamento facilitado. Inclui acompanhamento do funeral."></textarea>
+            </div>
+
+            <div style="background:#f0ede8;padding:1rem;border-radius:8px;margin:1rem 0;display:flex;justify-content:space-between;align-items:center;">
+                <span style="font-weight:700;color:var(--cinza-escuro);">VALOR TOTAL DO ORÇAMENTO:</span>
+                <span id="orc-total-preview" style="font-family:var(--fonte-titulo);font-size:1.4rem;font-weight:700;color:var(--cinza-escuro);">€ 0,00</span>
+            </div>
+
+            <div class="modal-acoes">
+                <button type="button" class="btn-modal-cancel" onclick="fecharModal('modal-orcamento')">Fechar</button>
+                <button type="button" class="btn-modal-ok" onclick="imprimirFolhaTimbrada()">🖨️ Visualizar / Imprimir PDF</button>
+                <button type="submit" class="btn-modal-ok" style="background:#27ae60;">💾 Guardar Orçamento</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Div escondida para renderizar a folha de orçamento imprimível em A4 -->
+<div id="printable-orcamento" style="display:none;"></div>
+
+<script src="../js/api.js"></script>
+<script>
+/* ══════════════════════════════════════════
+   AUTENTICAÇÃO
+══════════════════════════════════════════ */
+if (!Auth.estaAutenticado()) window.location.href = 'login.html';
+const utilizador = Auth.lerUtilizador();
+if (utilizador?.papel === 'admin')   window.location.href = 'admin.html';
+if (utilizador?.papel === 'cliente') window.location.href = 'painel-cliente.html';
+
+const primeiroNome = (utilizador?.nome || 'Prestador').split(' ')[0];
+document.getElementById('nav-avatar').textContent = primeiroNome.charAt(0).toUpperCase();
+document.getElementById('nav-nome').textContent   = primeiroNome;
+document.getElementById('hero-nome').textContent  = primeiroNome;
+document.getElementById('pf-av').textContent      = primeiroNome.charAt(0).toUpperCase();
+document.getElementById('pf-nome-h').textContent  = utilizador?.nome  || '';
+document.getElementById('pf-email-h').textContent = utilizador?.email || '';
+document.getElementById('pf-email').value         = utilizador?.email || '';
+
+/* ══════════════════════════════════════════
+   ÍCONES E FORMATAÇÃO
+══════════════════════════════════════════ */
+const icones = { funeral:'⚰️', cremação:'🕯️', cremacao:'🕯️', transporte:'🚗', urna:'🏺', flores:'🌹', outro:'✦' };
+const getIcone = c => icones[(c||'').toLowerCase()] || '✦';
+
+function formatarData(str) {
+    return new Date(str).toLocaleDateString('pt-PT', { day:'2-digit', month:'short', year:'numeric', hour:'2-digit', minute:'2-digit' });
+}
+
+function badgeIcone(estado) {
+    switch (estado) {
+        case 'pendente':   return '⏳';
+        case 'confirmado': return '✅';
+        case 'concluido':  return '🏁';
+        case 'cancelado':  return '✕';
+        default:           return '•';
+    }
+}
+
+function capitalizar(s) {
+    if (!s) return '';
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+/* ══════════════════════════════════════════
+   TABS
+══════════════════════════════════════════ */
+function mudarTab(nome, el) {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('activo'));
+    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('activo'));
+    if (el) el.classList.add('activo');
+    document.getElementById(`tab-${nome}`).classList.add('activo');
+    if (nome === 'servicos') carregarServicos();
+    if (nome === 'perfil')   carregarPerfil();
+    if (nome === 'pedidos')  carregarPedidos();
+}
+
+/* ══════════════════════════════════════════
+   TAB 1: PEDIDOS RECEBIDOS
+══════════════════════════════════════════ */
+let todosPedidos = [];
+let filtroEstadoAtual = 'todos';
+
+async function carregarPedidos() {
+    try {
+        const res = await api.pedidos.doPrestador();
+        todosPedidos = res.dados || [];
+
+        const pendentes   = todosPedidos.filter(p => p.estado === 'pendente').length;
+        const confirmados = todosPedidos.filter(p => p.estado === 'confirmado' || p.estado === 'concluido').length;
+
+        // Faturação calculada com base nos serviços confirmados/concluídos ou valor de orçamento
+        const totalFaturado = todosPedidos
+            .filter(p => p.estado === 'confirmado' || p.estado === 'concluido')
+            .reduce((acc, p) => acc + Number(p.valor_orcamento || p.servico_preco || 0), 0);
+
+        document.getElementById('st-faturacao').textContent   = formatarPreco(totalFaturado);
+        document.getElementById('st-pedidos').textContent     = todosPedidos.length;
+        document.getElementById('st-pendentes').textContent   = pendentes;
+        document.getElementById('badge-pedidos').textContent  = todosPedidos.length;
+
+        // Notificação
+        if (pendentes > 0) {
+            document.getElementById('notif-count').textContent = pendentes;
+            document.getElementById('notif-bar').classList.add('visivel');
+            document.getElementById('badge-pedidos').classList.add('novo');
+        } else {
+            document.getElementById('notif-bar').classList.remove('visivel');
+            document.getElementById('badge-pedidos').classList.remove('novo');
+        }
+
+        filtrarERenderizarPedidos();
+    } catch (e) {
+        mostrarToast('Erro ao carregar pedidos: ' + e.message, 'erro');
+    }
+}
+
+function filtrarPedidosPorEstado(estado, btn) {
+    filtroEstadoAtual = estado;
+    document.querySelectorAll('.btn-status-filtro').forEach(b => b.classList.remove('activo'));
+    if (btn) btn.classList.add('activo');
+    filtrarERenderizarPedidos();
+}
+
+function filtrarPedidosTexto() {
+    filtrarERenderizarPedidos();
+}
+
+function filtrarERenderizarPedidos() {
+    const termo = (document.getElementById('busca-pedidos')?.value || '').toLowerCase();
+    let lista = [...todosPedidos];
+
+    if (filtroEstadoAtual !== 'todos') {
+        lista = lista.filter(p => p.estado === filtroEstadoAtual);
+    }
+
+    if (termo) {
+        lista = lista.filter(p =>
+            (p.cliente_nome || '').toLowerCase().includes(termo) ||
+            (p.servico_nome || '').toLowerCase().includes(termo) ||
+            (p.cliente_telefone || '').toLowerCase().includes(termo)
+        );
+    }
+
+    renderizarPedidos(lista);
+}
+
+function renderizarPedidos(pedidos) {
+    const el = document.getElementById('lista-pedidos');
+    if (!pedidos.length) {
+        el.innerHTML = `<div class="vazio">
+            <div class="vi">📨</div>
+            <h3>Nenhum pedido encontrado</h3>
+            <p>Quando as famílias solicitarem informações sobre os seus serviços, eles aparecerão aqui.</p>
+        </div>`;
+        return;
+    }
+
+    el.innerHTML = pedidos.map(p => {
+        const tel = p.cliente_telefone || '';
+        const msgWhats = `Olá ${p.cliente_nome}, somos da funerária ${utilizador.nome || ''} relativamente ao seu contacto sobre o serviço "${p.servico_nome}" (Pedido #${p.id}). Estamos à vossa inteira disposição.`;
+        const msgSMS   = `Olá ${p.cliente_nome}, da funerária ${utilizador.nome || ''} sobre o pedido do serviço "${p.servico_nome}".`;
+
+        const linkWhats = ContactUtils.linkWhatsApp(tel, msgWhats);
+        const linkCham  = ContactUtils.linkChamada(tel);
+        const linkSms   = ContactUtils.linkSMS(tel, msgSMS);
+
+        return `
+        <div class="pedido-card ${p.estado === 'pendente' ? 'novo-pedido' : ''}">
+            <div class="pedido-header">
+                <div class="pedido-esq">
+                    <div class="ped-icone">${getIcone(p.servico_categoria || p.servico_nome)}</div>
+                    <div>
+                        <div class="ped-nome">${p.servico_nome}</div>
+                        <div class="ped-sub">Cliente: <strong>${p.cliente_nome}</strong> · Solicitado em ${formatarData(p.criado_em)}</div>
+                    </div>
+                </div>
+                <span class="estado-badge est-${p.estado}">
+                    ${badgeIcone(p.estado)} ${capitalizar(p.estado)}
+                </span>
+            </div>
+            <div class="pedido-corpo">
+                <div class="pedido-grid">
+                    <div class="ped-detalhe">
+                        <label>Nome do Cliente</label>
+                        <span>${p.cliente_nome}</span>
+                    </div>
+                    <div class="ped-detalhe">
+                        <label>Telefone</label>
+                        <span>${ContactUtils.formatarExibicao(tel)}</span>
+                    </div>
+                    <div class="ped-detalhe">
+                        <label>Email</label>
+                        <span>${p.cliente_email || '—'}</span>
+                    </div>
+                    <div class="ped-detalhe">
+                        <label>Valor de Catálogo</label>
+                        <span class="preco">${formatarPreco(p.servico_preco)}</span>
+                    </div>
+                </div>
+
+                ${p.mensagem ? `<div class="ped-mensagem"><strong>Mensagem do Cliente:</strong> "${p.mensagem}"</div>` : ''}
+
+                <!-- Bloco de Notas Privadas do Prestador -->
+                <div class="notas-box">
+                    <div class="notas-box-header">
+                        <span>📝 Anotações Internas da Agência (Privado)</span>
+                    </div>
+                    <textarea class="notas-textarea" id="nota-${p.id}" placeholder="Escreva anotações sobre a família, preferências, horários de atendimento...">${p.notas_prestador || ''}</textarea>
+                    <button type="button" class="btn-salvar-nota" onclick="salvarNotaPedido(${p.id})">Guardar Nota</button>
+                    <div style="clear:both;"></div>
+                </div>
+
+                <!-- Bloco de Orçamento emitido (se houver) -->
+                ${p.valor_orcamento ? `
+                    <div class="orcamento-resumo-box">
+                        <div class="orcamento-resumo-info">
+                            <strong>📄 Orçamento Emitido: ${formatarPreco(p.valor_orcamento)}</strong>
+                            <p>Proposta gravada para este pedido</p>
+                        </div>
+                        <button class="btn-orcamento-acao" onclick="abrirModalOrcamento(${p.id})">
+                            Ver / Reemitir Folha Timbrada 🖨️
+                        </button>
+                    </div>
+                ` : ''}
+
+                <!-- Ações e Comunicação Direta -->
+                <div class="pedido-acoes">
+                    <label>Estado do Pedido:</label>
+                    <select class="select-estado" id="sel-${p.id}">
+                        <option value="pendente"   ${p.estado==='pendente'   ?'selected':''}>⏳ Pendente</option>
+                        <option value="confirmado" ${p.estado==='confirmado' ?'selected':''}>✅ Confirmado</option>
+                        <option value="concluido"  ${p.estado==='concluido'  ?'selected':''}>🏁 Concluído</option>
+                        <option value="cancelado"  ${p.estado==='cancelado'  ?'selected':''}>✕ Cancelado</option>
+                    </select>
+                    <button class="btn-atualizar" onclick="atualizarEstado(${p.id})">
+                        Actualizar
+                    </button>
+
+                    ${!p.valor_orcamento ? `
+                        <button class="btn-orcamento-acao" onclick="abrirModalOrcamento(${p.id})">
+                            📄 Emitir Orçamento
+                        </button>
+                    ` : ''}
+
+                    ${tel ? `
+                        <a href="${linkWhats}" target="_blank" rel="noopener" class="btn-ligar whats">💬 WhatsApp</a>
+                        <a href="${linkCham}" class="btn-ligar">📞 Ligar</a>
+                        <a href="${linkSms}" class="btn-ligar sms">✉️ SMS</a>` : ''}
+                    ${p.cliente_email ? `
+                        <a href="mailto:${p.cliente_email}?subject=Resposta%20ao%20Pedido%20-%20${encodeURIComponent(p.servico_nome)}" class="btn-ligar">📧 Email</a>` : ''}
+                </div>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+async function atualizarEstado(pedidoId) {
+    const estado = document.getElementById(`sel-${pedidoId}`).value;
+    try {
+        await api.pedidos.atualizarEstado(pedidoId, estado);
+        mostrarToast('Estado actualizado com sucesso!');
+        carregarPedidos();
+    } catch (e) {
+        mostrarToast('Erro: ' + e.message, 'erro');
+    }
+}
+
+async function salvarNotaPedido(pedidoId) {
+    const notas = document.getElementById(`nota-${pedidoId}`).value;
+    try {
+        await api.pedidos.salvarNotas(pedidoId, notas);
+        mostrarToast('Nota privada guardada com sucesso!');
+    } catch (e) {
+        mostrarToast('Erro ao guardar nota: ' + e.message, 'erro');
+    }
+}
+
+/* ══════════════════════════════════════════
+   TAB 2: SERVIÇOS & PACOTES
+══════════════════════════════════════════ */
+let todosServicos = [];
+
+async function carregarServicos() {
+    try {
+        const res = await api.servicos.porPrestador(utilizador.id);
+        todosServicos = res.dados || [];
+        document.getElementById('st-servicos').textContent   = todosServicos.filter(s => s.estado === 'ativo').length;
+        document.getElementById('badge-servicos').textContent = todosServicos.length;
+        filtrarServicosTexto();
+    } catch (e) {
+        mostrarToast('Erro ao carregar serviços: ' + e.message, 'erro');
+    }
+}
+
+function filtrarServicosTexto() {
+    const termo = (document.getElementById('busca-servicos-inp')?.value || '').toLowerCase();
+    const lista = todosServicos.filter(s =>
+        (s.nome || '').toLowerCase().includes(termo) ||
+        (s.categoria || '').toLowerCase().includes(termo) ||
+        (s.descricao || '').toLowerCase().includes(termo)
+    );
+    renderizarServicos(lista);
+}
+
+function renderizarServicos(servicos) {
+    const el = document.getElementById('grelha-servicos');
+    if (!servicos.length) {
+        el.innerHTML = `<div class="vazio" style="grid-column:1/-1;">
+            <div class="vi">📋</div>
+            <h3>Nenhum serviço registado</h3>
+            <p>Adicione os serviços e pacotes funerários da sua agência para receber solicitações de famílias.</p>
+            <button class="btn-novo-servico" onclick="abrirModalServico()" style="margin-top:1rem;">+ Criar Primeiro Serviço</button>
+        </div>`;
+        return;
+    }
+
+    el.innerHTML = servicos.map(s => {
+        let itens = [];
+        try {
+            itens = typeof s.itens_incluidos === 'string' ? JSON.parse(s.itens_incluidos) : (s.itens_incluidos || []);
+        } catch (_) { itens = []; }
+
+        const imgStyle = s.imagem_url ? `background-image: url('${s.imagem_url}');` : `background: linear-gradient(135deg, #1a252f, #34495e);`;
+
+        return `
+        <div class="servico-card">
+            <div class="servico-img-box" style="${imgStyle}">
+                <span class="servico-tipo-badge">${s.tipo_servico || 'Pacote'}</span>
+            </div>
+            <div class="servico-card-header">
+                <span class="servico-cat-badge">✦ ${s.categoria}</span>
+                <span class="servico-estado-badge srv-${s.estado}">${capitalizar(s.estado)}</span>
+            </div>
+            <div class="servico-card-corpo">
+                <h3>${s.nome}</h3>
+                <p>${s.descricao || 'Sem descrição inserida.'}</p>
+
+                ${itens.length ? `
+                    <div class="itens-incluidos-pills">
+                        ${itens.slice(0, 4).map(it => `<span class="item-pill destaque">✓ ${it}</span>`).join('')}
+                        ${itens.length > 4 ? `<span class="item-pill">+${itens.length - 4} itens</span>` : ''}
+                    </div>
+                ` : ''}
+
+                <div class="servico-preco-linha">
+                    <span style="font-size:.75rem;color:var(--cor-texto-leve);">${s.duracao_horas ? s.duracao_horas + 'h duração' : ''}</span>
+                    <span class="servico-preco">${formatarPreco(s.preco)}</span>
+                </div>
+            </div>
+            <div class="servico-card-footer">
+                <button class="btn-editar-srv" onclick="editarServico(${s.id})">Editar</button>
+                <button class="btn-apagar-srv" onclick="apagarServico(${s.id})">Apagar</button>
+            </div>
+        </div>
+        `;
+    }).join('');
+}
+
+function abrirModalServico() {
+    document.getElementById('form-servico').reset();
+    document.getElementById('srv-id').value = '';
+    document.getElementById('modal-srv-titulo').textContent = 'Novo Serviço / Pacote';
+    document.getElementById('grp-estado-srv').style.display = 'none';
+    document.querySelectorAll('.chk-item').forEach(c => c.checked = false);
+    abrirModal('modal-srv');
+}
+
+function editarServico(id) {
+    const s = todosServicos.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('srv-id').value         = s.id;
+    document.getElementById('srv-nome').value       = s.nome;
+    document.getElementById('srv-categoria').value  = s.categoria;
+    document.getElementById('srv-tipo').value       = s.tipo_servico || 'pacote';
+    document.getElementById('srv-preco').value      = s.preco;
+    document.getElementById('srv-duracao').value    = s.duracao_horas || '';
+    document.getElementById('srv-imagem').value     = s.imagem_url || '';
+    document.getElementById('srv-descricao').value  = s.descricao || '';
+    document.getElementById('srv-estado').value     = s.estado || 'ativo';
+    document.getElementById('grp-estado-srv').style.display = 'block';
+    document.getElementById('modal-srv-titulo').textContent = 'Editar Serviço';
+
+    let itens = [];
+    try {
+        itens = typeof s.itens_incluidos === 'string' ? JSON.parse(s.itens_incluidos) : (s.itens_incluidos || []);
+    } catch (_) { itens = []; }
+
+    const extras = [];
+    document.querySelectorAll('.chk-item').forEach(c => {
+        if (itens.includes(c.value)) {
+            c.checked = true;
+        } else {
+            c.checked = false;
+        }
+    });
+
+    itens.forEach(it => {
+        const checkbox = Array.from(document.querySelectorAll('.chk-item')).find(c => c.value === it);
+        if (!checkbox) extras.push(it);
+    });
+    document.getElementById('srv-itens-extra').value = extras.join(', ');
+
+    abrirModal('modal-srv');
+}
+
+document.getElementById('form-servico').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('srv-id').value;
+
+    const itensSelecionados = Array.from(document.querySelectorAll('.chk-item:checked')).map(c => c.value);
+    const extras = document.getElementById('srv-itens-extra').value
+        .split(',')
+        .map(x => x.trim())
+        .filter(Boolean);
+    const todosItens = [...itensSelecionados, ...extras];
+
+    const payload = {
+        nome:          document.getElementById('srv-nome').value,
+        categoria:     document.getElementById('srv-categoria').value,
+        tipo_servico:  document.getElementById('srv-tipo').value,
+        preco:         document.getElementById('srv-preco').value,
+        duracao_horas: document.getElementById('srv-duracao').value || null,
+        imagem_url:    document.getElementById('srv-imagem').value || null,
+        descricao:     document.getElementById('srv-descricao').value,
+        itens_incluidos: todosItens,
+        estado:        document.getElementById('srv-estado').value || 'ativo'
+    };
+
+    try {
+        if (id) {
+            await api.servicos.atualizar(id, payload);
+            mostrarToast('Serviço atualizado com sucesso!');
+        } else {
+            await api.servicos.criar(payload);
+            mostrarToast('Novo serviço criado com sucesso!');
+        }
+        fecharModal('modal-srv');
+        carregarServicos();
+    } catch (err) {
+        mostrarToast('Erro: ' + err.message, 'erro');
+    }
+});
+
+async function apagarServico(id) {
+    if (!confirm('Tem a certeza de que deseja eliminar este serviço?')) return;
+    try {
+        await api.servicos.eliminar(id);
+        mostrarToast('Serviço eliminado com sucesso!');
+        carregarServicos();
+    } catch (err) {
+        mostrarToast('Erro: ' + err.message, 'erro');
+    }
+}
+
+/* ══════════════════════════════════════════
+   TAB 3: PERFIL DA AGÊNCIA
+══════════════════════════════════════════ */
+let dadosAgencia = null;
+
+async function carregarPerfil() {
+    try {
+        const res = await api.auth.perfil();
+        dadosAgencia = res.utilizador;
+        document.getElementById('pf-nome').value      = dadosAgencia.nome || '';
+        document.getElementById('pf-nif').value       = dadosAgencia.nif || '';
+        document.getElementById('pf-telefone').value  = dadosAgencia.telefone || '';
+        document.getElementById('pf-cidade').value    = dadosAgencia.cidade || '';
+        document.getElementById('pf-morada').value    = dadosAgencia.morada || '';
+        document.getElementById('pf-horario').value   = dadosAgencia.horario || 'Piquete 24h / 7 dias por semana';
+        document.getElementById('pf-areas').value     = dadosAgencia.areas_atuacao || '';
+        document.getElementById('pf-logo').value      = dadosAgencia.logo_url || '';
+        document.getElementById('pf-website').value   = dadosAgencia.website || '';
+        document.getElementById('pf-descricao').value = dadosAgencia.descricao || '';
+        atualizarPreviewLogo();
+    } catch (_) {}
+}
+
+function definirHorario24h() {
+    document.getElementById('pf-horario').value = 'Piquete 24h / 7 dias por semana';
+}
+
+function atualizarPreviewLogo() {
+    const url = document.getElementById('pf-logo')?.value;
+    const av = document.getElementById('pf-av');
+    if (url && url.startsWith('http')) {
+        av.style.backgroundImage = `url('${url}')`;
+        av.textContent = '';
+    } else {
+        av.style.backgroundImage = '';
+        av.textContent = (utilizador?.nome || 'A').charAt(0).toUpperCase();
+    }
+}
+
+async function guardarPerfil() {
+    const btn = document.getElementById('btn-pf-txt');
+    btn.textContent = 'A guardar dados...';
+    try {
+        const payload = {
+            nome:          document.getElementById('pf-nome').value,
+            nif:           document.getElementById('pf-nif').value,
+            telefone:      document.getElementById('pf-telefone').value,
+            cidade:        document.getElementById('pf-cidade').value,
+            morada:        document.getElementById('pf-morada').value,
+            horario:       document.getElementById('pf-horario').value,
+            areas_atuacao: document.getElementById('pf-areas').value,
+            logo_url:      document.getElementById('pf-logo').value,
+            website:       document.getElementById('pf-website').value,
+            descricao:     document.getElementById('pf-descricao').value
+        };
+
+        const res = await api.prestadores.atualizar(utilizador.id, payload);
+        dadosAgencia = res.dados;
+        mostrarToast('Perfil da agência atualizado com sucesso!');
+
+        utilizador.nome = payload.nome;
+        Auth.guardarUtilizador(utilizador);
+        document.getElementById('pf-nome-h').textContent  = payload.nome;
+        document.getElementById('nav-nome').textContent   = payload.nome.split(' ')[0];
+        document.getElementById('hero-nome').textContent  = payload.nome.split(' ')[0];
+    } catch (e) {
+        mostrarToast('Erro ao atualizar perfil: ' + e.message, 'erro');
+    }
+    btn.textContent = 'Guardar alterações da agência';
+}
+
+/* ══════════════════════════════════════════
+   EMISSOR DE ORÇAMENTO FORMAL
+══════════════════════════════════════════ */
+let pedidoOrcamentoAtual = null;
+
+function abrirModalOrcamento(pedidoId) {
+    const p = todosPedidos.find(x => x.id === pedidoId);
+    if (!p) return;
+    pedidoOrcamentoAtual = p;
+
+    document.getElementById('orc-pedido-id').value      = p.id;
+    document.getElementById('orc-cliente-nome').value   = p.cliente_nome;
+    document.getElementById('orc-servico-nome').value   = p.servico_nome;
+    document.getElementById('orc-valor-base').value     = p.valor_orcamento || p.servico_preco || 0;
+    document.getElementById('orc-obs').value            = p.detalhes_orcamento?.observacoes || 'Proposta detalhada de prestação de serviços funerários com total dignidade e acompanhamento.';
+
+    document.getElementById('orc-detalhe-pedido-info').innerHTML = `
+        <strong>Pedido #${p.id}</strong> — Cliente: <strong>${p.cliente_nome}</strong> (${p.cliente_telefone || 'Sem telefone'}) · Localidade: ${p.cliente_cidade || 'Não informada'}
+    `;
+
+    const container = document.getElementById('orc-itens-container');
+    container.innerHTML = '';
+
+    if (p.detalhes_orcamento?.itens_extra?.length) {
+        p.detalhes_orcamento.itens_extra.forEach(it => {
+            adicionarLinhaOrcamento(it.nome, it.valor);
+        });
+    }
+
+    calcularTotalOrcamento();
+    abrirModal('modal-orcamento');
+}
+
+function adicionarLinhaOrcamento(nome = '', valor = 0) {
+    const container = document.getElementById('orc-itens-container');
+    const div = document.createElement('div');
+    div.className = 'modal-grid-2';
+    div.style.marginBottom = '.5rem';
+    div.innerHTML = `
+        <input type="text" class="orc-extra-nome" placeholder="Descrição do item extra (ex: Arranjo floral nobre)" value="${nome}" />
+        <div style="display:flex;gap:.4rem;">
+            <input type="number" class="orc-extra-valor" placeholder="€ Valor" step="0.01" value="${valor || ''}" oninput="calcularTotalOrcamento()" />
+            <button type="button" onclick="this.parentElement.parentElement.remove();calcularTotalOrcamento();" style="border:none;background:#fde8e8;color:#c0392b;border-radius:6px;padding:0 .6rem;cursor:pointer;">✕</button>
+        </div>
+    `;
+    container.appendChild(div);
+}
+
+function calcularTotalOrcamento() {
+    const base = parseFloat(document.getElementById('orc-valor-base').value) || 0;
+    let extras = 0;
+    document.querySelectorAll('.orc-extra-valor').forEach(inp => {
+        extras += parseFloat(inp.value) || 0;
+    });
+    const total = base + extras;
+    document.getElementById('orc-total-preview').textContent = formatarPreco(total);
+    return total;
+}
+
+async function guardarEImprimirOrcamento(e) {
+    e.preventDefault();
+    const pedidoId = document.getElementById('orc-pedido-id').value;
+    const total = calcularTotalOrcamento();
+
+    const extras = [];
+    const nomes = document.querySelectorAll('.orc-extra-nome');
+    const valores = document.querySelectorAll('.orc-extra-valor');
+    nomes.forEach((n, idx) => {
+        if (n.value.trim()) {
+            extras.push({ nome: n.value.trim(), valor: parseFloat(valores[idx].value) || 0 });
+        }
+    });
+
+    const detalhes = {
+        servico_base_nome: document.getElementById('orc-servico-nome').value,
+        servico_base_valor: parseFloat(document.getElementById('orc-valor-base').value) || 0,
+        itens_extra: extras,
+        observacoes: document.getElementById('orc-obs').value,
+        data_emissao: new Date().toISOString()
+    };
+
+    try {
+        await api.pedidos.salvarOrcamento(pedidoId, total, detalhes);
+        mostrarToast('Orçamento guardado com sucesso!');
+        fecharModal('modal-orcamento');
+        carregarPedidos();
+    } catch (err) {
+        mostrarToast('Erro: ' + err.message, 'erro');
+    }
+}
+
+function imprimirFolhaTimbrada() {
+    const p = pedidoOrcamentoAtual;
+    if (!p) return;
+
+    const baseNome  = document.getElementById('orc-servico-nome').value;
+    const baseValor = parseFloat(document.getElementById('orc-valor-base').value) || 0;
+    const obs       = document.getElementById('orc-obs').value;
+    const total     = calcularTotalOrcamento();
+
+    const extras = [];
+    const nomes   = document.querySelectorAll('.orc-extra-nome');
+    const valores = document.querySelectorAll('.orc-extra-valor');
+    nomes.forEach((n, idx) => {
+        if (n.value.trim()) {
+            extras.push({ nome: n.value.trim(), valor: parseFloat(valores[idx].value) || 0 });
+        }
+    });
+
+    const printDiv = document.getElementById('printable-orcamento');
+    printDiv.style.display = 'block';
+    printDiv.innerHTML = `
+        <div class="folha-orcamento-view">
+            <div class="orc-header">
+                <div>
+                    <div class="orc-logo-txt">✝ ${dadosAgencia?.nome || utilizador?.nome || 'Agência Funerária'}</div>
+                    <div style="font-size:.85rem;color:#666;margin-top:.2rem;">
+                        ${dadosAgencia?.morada ? dadosAgencia.morada + ' · ' : ''}${dadosAgencia?.cidade || 'Portugal'}<br />
+                        ${dadosAgencia?.nif ? 'NIF: ' + dadosAgencia.nif + ' · ' : ''}Tel: ${dadosAgencia?.telefone || ''}<br />
+                        ${dadosAgencia?.horario || 'Atendimento 24h'}
+                    </div>
+                </div>
+                <div class="orc-meta">
+                    <h2 style="font-size:1.3rem;color:#1a252f;margin-bottom:.3rem;">PROPOSTA DE ORÇAMENTO</h2>
+                    <div>Orçamento #${p.id}</div>
+                    <div>Data: ${new Date().toLocaleDateString('pt-PT')}</div>
+                    <div style="margin-top:.5rem;"><strong>Cliente:</strong> ${p.cliente_nome}</div>
+                    <div>${p.cliente_telefone ? 'Tel: ' + p.cliente_telefone : ''}</div>
+                </div>
+            </div>
+
+            <table class="orc-tabela">
+                <thead>
+                    <tr>
+                        <th>Item / Descrição do Serviço</th>
+                        <th style="text-align:right;width:130px;">Valor (€)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>${baseNome}</strong> (Serviço Base)</td>
+                        <td style="text-align:right;">${formatarPreco(baseValor)}</td>
+                    </tr>
+                    ${extras.map(it => `
+                        <tr>
+                            <td>${it.nome}</td>
+                            <td style="text-align:right;">${formatarPreco(it.valor)}</td>
+                        </tr>
+                    `).join('')}
+                    <tr class="orc-total-row">
+                        <td>TOTAL GERAL ESTIMADO</td>
+                        <td style="text-align:right;">${formatarPreco(total)}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top:1.5rem;font-size:.85rem;color:#555;background:#fdfcf9;padding:1rem;border-radius:6px;border-left:3px solid #c9a84c;">
+                <strong>Condições & Notas:</strong><br />
+                ${obs || 'Orçamento emitido com rigor e transparência. Sem custos adicionais ocultos.'}
+            </div>
+
+            <div style="margin-top:3rem;display:flex;justify-content:space-between;padding:0 2rem;text-align:center;font-size:.8rem;color:#777;">
+                <div style="border-top:1px solid #ccc;padding-top:.5rem;width:200px;">Assinatura da Agência</div>
+                <div style="border-top:1px solid #ccc;padding-top:.5rem;width:200px;">Assinatura do Cliente</div>
+            </div>
+        </div>
+    `;
+
+    window.print();
+}
+
+/* ══════════════════════════════════════════
+   MODAIS AUXILIARES
+══════════════════════════════════════════ */
+function abrirModal(id) {
+    document.getElementById(id).classList.add('aberto');
+}
+function fecharModal(id) {
+    document.getElementById(id).classList.remove('aberto');
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) overlay.classList.remove('aberto');
+    });
+});
+
+/* ══════════════════════════════════════════
+   INICIALIZAÇÃO
+══════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', async () => {
+    await carregarPerfil();
+    await carregarPedidos();
+    await carregarServicos();
+});
+</script>
+</body>
+</html>

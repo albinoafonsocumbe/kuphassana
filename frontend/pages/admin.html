@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Painel Administrativo — Plataforma Funerária</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        body { display: flex; flex-direction: column; min-height: 100vh; background: var(--cor-fundo); }
+
+        /* ── Layout ── */
+        .admin-layout { display: flex; flex: 1; }
+
+        /* ── Sidebar ── */
+        .sidebar {
+            width: 240px;
+            background: #1a252f;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            min-height: calc(100vh - 64px);
+            flex-shrink: 0;
+        }
+        .sidebar-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,.08);
+        }
+        .sidebar-header .titulo { font-size: .95rem; font-weight: 700; color: #e74c3c; text-transform: uppercase; letter-spacing: .5px; }
+        .sidebar-header .admin-badge {
+            display: inline-block;
+            background: rgba(231,76,60,.2);
+            color: #e74c3c;
+            font-size: .7rem;
+            padding: .15rem .5rem;
+            border-radius: 20px;
+            margin-top: .3rem;
+            font-weight: 600;
+        }
+
+        .sidebar nav { padding: .75rem 0; flex: 1; }
+        .sidebar nav a {
+            display: flex;
+            align-items: center;
+            gap: .75rem;
+            padding: .7rem 1.5rem;
+            color: rgba(255,255,255,.7);
+            font-size: .88rem;
+            transition: background .15s, color .15s;
+            cursor: pointer;
+        }
+        .sidebar nav a:hover,
+        .sidebar nav a.activo {
+            background: rgba(255,255,255,.08);
+            color: #fff;
+        }
+        .sidebar nav a .icone { font-size: 1rem; width: 20px; text-align: center; }
+
+        .sidebar-footer {
+            padding: 1.25rem 1.5rem;
+            border-top: 1px solid rgba(255,255,255,.08);
+        }
+        .sidebar-footer .admin-info { font-size: .82rem; color: rgba(255,255,255,.5); margin-bottom: .75rem; }
+        .btn-sair {
+            width: 100%;
+            padding: .55rem;
+            background: rgba(231,76,60,.15);
+            color: rgba(255,255,255,.8);
+            border: 1px solid rgba(231,76,60,.3);
+            border-radius: var(--raio);
+            cursor: pointer;
+            font-size: .82rem;
+            transition: background .2s;
+        }
+        .btn-sair:hover { background: rgba(231,76,60,.4); color: #fff; }
+
+        /* ── Conteúdo ── */
+        .admin-conteudo {
+            flex: 1;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .secao { display: none; }
+        .secao.activa { display: block; }
+
+        .secao-titulo-pg {
+            margin-bottom: 2rem;
+        }
+        .secao-titulo-pg h1 { font-size: 1.5rem; color: var(--cor-primaria); }
+        .secao-titulo-pg p  { color: var(--cor-texto-leve); font-size: .9rem; margin-top: .25rem; }
+
+        /* ── Stats ── */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 2.5rem;
+        }
+        .stat-card {
+            background: var(--cor-branco);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stat-icone {
+            width: 48px; height: 48px;
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .stat-icone.azul   { background: #d6eaf8; }
+        .stat-icone.verde  { background: #d5f5e3; }
+        .stat-icone.laranja{ background: #fdebd0; }
+        .stat-icone.roxo   { background: #e8daef; }
+
+        .stat-info .num   { font-size: 1.8rem; font-weight: 700; color: var(--cor-primaria); line-height: 1; }
+        .stat-info .label { font-size: .82rem; color: var(--cor-texto-leve); margin-top: .25rem; }
+
+        /* ── Tabela ── */
+        .tabela-card {
+            background: var(--cor-branco);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+            overflow: hidden;
+            margin-bottom: 2rem;
+        }
+        .tabela-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.1rem 1.5rem;
+            border-bottom: 1px solid var(--cor-borda);
+            flex-wrap: wrap;
+            gap: .75rem;
+        }
+        .tabela-header h2 { font-size: 1rem; color: var(--cor-primaria); }
+        .tabela-header .acoes-header { display: flex; gap: .6rem; align-items: center; flex-wrap: wrap; }
+        .tabela-header input {
+            padding: .4rem .8rem;
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio);
+            font-size: .85rem;
+            outline: none;
+            width: 180px;
+        }
+        .tabela-header input:focus { border-color: var(--cor-primaria); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: .85rem 1.25rem; text-align: left; font-size: .85rem; }
+        th {
+            background: var(--cor-fundo);
+            color: var(--cor-texto-leve);
+            font-weight: 600;
+            font-size: .78rem;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+        }
+        tr:not(:last-child) td { border-bottom: 1px solid var(--cor-borda); }
+        tbody tr:hover td { background: #fafbfc; }
+
+        .badge { display: inline-block; padding: .2rem .65rem; border-radius: 20px; font-size: .72rem; font-weight: 700; }
+        .badge-ativo    { background: #d5f5e3; color: #1e8449; }
+        .badge-inativo  { background: #fdebd0; color: #a04000; }
+        .badge-suspenso { background: #fadbd8; color: #922b21; }
+        .badge-admin    { background: #d6eaf8; color: #1a5276; }
+
+        .acoes-td { display: flex; gap: .4rem; }
+        .btn-sm {
+            padding: .3rem .65rem;
+            border: 1px solid var(--cor-borda);
+            border-radius: 6px;
+            background: none;
+            font-size: .78rem;
+            cursor: pointer;
+            transition: all .2s;
+        }
+        .btn-sm.vermelho:hover { background: var(--cor-destaque); color: #fff; border-color: var(--cor-destaque); }
+        .btn-sm.verde:hover    { background: #27ae60; color: #fff; border-color: #27ae60; }
+        .btn-sm.azul:hover     { background: var(--cor-primaria); color: #fff; border-color: var(--cor-primaria); }
+
+        /* ── Modal ── */
+        .modal-overlay {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,.45);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+        }
+        .modal-overlay.aberto { display: flex; }
+        .modal {
+            background: var(--cor-branco);
+            border-radius: var(--raio);
+            box-shadow: 0 8px 32px rgba(0,0,0,.2);
+            width: 100%; max-width: 480px;
+            padding: 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal h3 { font-size: 1.1rem; color: var(--cor-primaria); margin-bottom: 1.5rem; }
+        .modal .grupo { margin-bottom: 1rem; }
+        .modal .grupo label { display: block; font-size: .82rem; font-weight: 600; margin-bottom: .3rem; }
+        .modal .grupo input,
+        .modal .grupo select {
+            width: 100%; padding: .6rem .9rem;
+            border: 1px solid var(--cor-borda); border-radius: var(--raio);
+            font-size: .9rem; outline: none;
+        }
+        .modal .grupo input:focus,
+        .modal .grupo select:focus { border-color: var(--cor-primaria); }
+        .modal-acoes { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.25rem; }
+        .btn-cancelar { padding: .55rem 1.1rem; border: 1px solid var(--cor-borda); border-radius: var(--raio); background: none; cursor: pointer; font-size: .88rem; }
+        .btn-guardar  { padding: .55rem 1.3rem; background: var(--cor-primaria); color: #fff; border: none; border-radius: var(--raio); font-size: .88rem; font-weight: 600; cursor: pointer; transition: background .2s; }
+        .btn-guardar:hover { background: #1a252f; }
+
+        /* ── Linha vazia ── */
+        .linha-vazia td { text-align: center; padding: 3rem; color: var(--cor-texto-leve); }
+
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .admin-conteudo { padding: 1rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="navbar-logo">☩ Plataforma <span>Funerária</span></div>
+    <div class="navbar-links">
+        <a href="../index.html" target="_blank">Ver site</a>
+        <span style="color:rgba(255,255,255,.7); font-size:.85rem;" id="navbar-admin"></span>
+    </div>
+</nav>
+
+<div class="admin-layout">
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="titulo">Administração</div>
+            <div class="admin-badge">Admin</div>
+        </div>
+        <nav>
+            <a class="activo" onclick="mostrarSecao('dashboard')">
+                <span class="icone">📊</span> Dashboard
+            </a>
+            <a onclick="mostrarSecao('prestadores')">
+                <span class="icone">👥</span> Prestadores
+            </a>
+            <a onclick="mostrarSecao('servicos')">
+                <span class="icone">📋</span> Serviços
+            </a>
+        </nav>
+        <div class="sidebar-footer">
+            <div class="admin-info" id="admin-email"></div>
+            <button class="btn-sair" onclick="Auth.terminarSessao()">Sair →</button>
+        </div>
+    </aside>
+
+    <!-- Conteúdo -->
+    <main class="admin-conteudo">
+
+        <!-- ── DASHBOARD ── -->
+        <div id="secao-dashboard" class="secao activa">
+            <div class="secao-titulo-pg">
+                <h1>Dashboard</h1>
+                <p>Visão geral da plataforma</p>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icone azul">👥</div>
+                    <div class="stat-info">
+                        <div class="num" id="dash-prestadores">—</div>
+                        <div class="label">Prestadores</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icone verde">📋</div>
+                    <div class="stat-info">
+                        <div class="num" id="dash-servicos">—</div>
+                        <div class="label">Serviços activos</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icone laranja">🏙️</div>
+                    <div class="stat-info">
+                        <div class="num" id="dash-cidades">—</div>
+                        <div class="label">Cidades</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icone roxo">🏷️</div>
+                    <div class="stat-info">
+                        <div class="num" id="dash-categorias">—</div>
+                        <div class="label">Categorias</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimos prestadores -->
+            <div class="tabela-card">
+                <div class="tabela-header">
+                    <h2>Últimos prestadores registados</h2>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>Email</th>
+                            <th>Cidade</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody id="dash-tabela-prestadores">
+                        <tr class="linha-vazia"><td colspan="4">A carregar…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── PRESTADORES ── -->
+        <div id="secao-prestadores" class="secao">
+            <div class="secao-titulo-pg">
+                <h1>Prestadores</h1>
+                <p>Gerir todos os prestadores da plataforma</p>
+            </div>
+
+            <div class="tabela-card">
+                <div class="tabela-header">
+                    <h2>Lista de prestadores</h2>
+                    <div class="acoes-header">
+                        <input type="text" id="pesq-prestadores" placeholder="🔍 Pesquisar…" oninput="filtrarPrestadores()" />
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Nome</th><th>Email</th>
+                            <th>Cidade</th><th>Estado</th><th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-prestadores">
+                        <tr class="linha-vazia"><td colspan="6">A carregar…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ── SERVIÇOS ── -->
+        <div id="secao-servicos" class="secao">
+            <div class="secao-titulo-pg">
+                <h1>Serviços</h1>
+                <p>Gerir todos os serviços da plataforma</p>
+            </div>
+
+            <div class="tabela-card">
+                <div class="tabela-header">
+                    <h2>Lista de serviços</h2>
+                    <div class="acoes-header">
+                        <input type="text" id="pesq-servicos" placeholder="🔍 Pesquisar…" oninput="filtrarServicos()" />
+                    </div>
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th><th>Nome</th><th>Prestador</th>
+                            <th>Categoria</th><th>Preço</th><th>Estado</th><th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-servicos">
+                        <tr class="linha-vazia"><td colspan="7">A carregar…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Modal: editar estado do prestador -->
+<div class="modal-overlay" id="modal-prestador">
+    <div class="modal">
+        <h3>Editar prestador</h3>
+        <form id="form-prestador">
+            <input type="hidden" id="p-id" />
+            <div class="grupo">
+                <label>Nome</label>
+                <input type="text" id="p-nome" required />
+            </div>
+            <div class="grupo">
+                <label>Telefone</label>
+                <input type="text" id="p-telefone" />
+            </div>
+            <div class="grupo">
+                <label>Cidade</label>
+                <input type="text" id="p-cidade" />
+            </div>
+            <div class="grupo">
+                <label>Morada</label>
+                <input type="text" id="p-morada" />
+            </div>
+            <div class="grupo">
+                <label>Estado</label>
+                <select id="p-estado">
+                    <option value="ativo">Activo</option>
+                    <option value="inativo">Inactivo</option>
+                    <option value="suspenso">Suspenso</option>
+                </select>
+            </div>
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
+                <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal: editar estado do serviço -->
+<div class="modal-overlay" id="modal-servico">
+    <div class="modal">
+        <h3>Editar serviço</h3>
+        <form id="form-servico-admin">
+            <input type="hidden" id="sv-id" />
+            <div class="grupo">
+                <label>Nome</label>
+                <input type="text" id="sv-nome" required />
+            </div>
+            <div class="grupo">
+                <label>Categoria</label>
+                <select id="sv-categoria">
+                    <option>Funeral</option><option>Cremação</option>
+                    <option>Transporte</option><option>Urna</option>
+                    <option>Flores</option><option>Outro</option>
+                </select>
+            </div>
+            <div class="grupo">
+                <label>Preço (€)</label>
+                <input type="number" id="sv-preco" min="0" step="0.01" required />
+            </div>
+            <div class="grupo">
+                <label>Estado</label>
+                <select id="sv-estado">
+                    <option value="ativo">Activo</option>
+                    <option value="inativo">Inactivo</option>
+                </select>
+            </div>
+            <div class="modal-acoes">
+                <button type="button" class="btn-cancelar" onclick="fecharModais()">Cancelar</button>
+                <button type="submit" class="btn-guardar">Guardar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script src="../js/api.js"></script>
+<script>
+// ── Verificar autenticação e papel ──────────────────
+if (!Auth.estaAutenticado()) window.location.href = 'login.html';
+const utilizador = Auth.lerUtilizador();
+if (utilizador?.papel !== 'admin') window.location.href = 'painel.html';
+
+document.getElementById('navbar-admin').textContent = utilizador?.nome || '';
+document.getElementById('admin-email').textContent  = utilizador?.email || '';
+
+// ── Dados em memória ────────────────────────────────
+let todosPrestadores = [];
+let todosServicos    = [];
+
+// ── Navegação entre secções ─────────────────────────
+function mostrarSecao(nome) {
+    document.querySelectorAll('.secao').forEach(s => s.classList.remove('activa'));
+    document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.remove('activo'));
+
+    document.getElementById(`secao-${nome}`).classList.add('activa');
+    event.currentTarget.classList.add('activo');
+
+    if (nome === 'dashboard')   carregarDashboard();
+    if (nome === 'prestadores') carregarPrestadores();
+    if (nome === 'servicos')    carregarServicos();
+}
+
+// ── DASHBOARD ───────────────────────────────────────
+async function carregarDashboard() {
+    try {
+        const [resPrestadores, resServicos, resCategorias] = await Promise.all([
+            api.prestadores.listar(),
+            api.servicos.listar({ limite: 1000 }),
+            api.servicos.categorias()
+        ]);
+
+        const prestadores = resPrestadores.dados;
+        const servicos    = resServicos.dados;
+        const cidades     = new Set(prestadores.map(p => p.cidade).filter(Boolean));
+
+        document.getElementById('dash-prestadores').textContent = prestadores.length;
+        document.getElementById('dash-servicos').textContent    = servicos.length;
+        document.getElementById('dash-cidades').textContent     = cidades.size;
+        document.getElementById('dash-categorias').textContent  = resCategorias.dados.length;
+
+        // Últimos 5 prestadores
+        const ultimos = [...prestadores].slice(0, 5);
+        document.getElementById('dash-tabela-prestadores').innerHTML = ultimos.length
+            ? ultimos.map(p => `
+                <tr>
+                    <td><strong>${p.nome}</strong></td>
+                    <td>${p.email}</td>
+                    <td>${p.cidade || '—'}</td>
+                    <td><span class="badge badge-${p.estado || 'ativo'}">${p.estado || 'ativo'}</span></td>
+                </tr>`).join('')
+            : '<tr class="linha-vazia"><td colspan="4">Sem prestadores.</td></tr>';
+
+    } catch (e) {
+        mostrarToast('Erro ao carregar dashboard: ' + e.message, 'erro');
+    }
+}
+
+// ── PRESTADORES ─────────────────────────────────────
+async function carregarPrestadores() {
+    try {
+        const resposta = await api.prestadores.listar();
+        todosPrestadores = resposta.dados;
+        renderizarPrestadores(todosPrestadores);
+    } catch (e) {
+        mostrarToast('Erro ao carregar prestadores.', 'erro');
+    }
+}
+
+function filtrarPrestadores() {
+    const termo = document.getElementById('pesq-prestadores').value.toLowerCase();
+    renderizarPrestadores(
+        todosPrestadores.filter(p =>
+            p.nome.toLowerCase().includes(termo) ||
+            (p.email || '').toLowerCase().includes(termo) ||
+            (p.cidade || '').toLowerCase().includes(termo)
+        )
+    );
+}
+
+function renderizarPrestadores(lista) {
+    const tbody = document.getElementById('tabela-prestadores');
+    if (!lista.length) {
+        tbody.innerHTML = '<tr class="linha-vazia"><td colspan="6">Nenhum prestador encontrado.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = lista.map(p => `
+        <tr>
+            <td>${p.id}</td>
+            <td><strong>${p.nome}</strong></td>
+            <td>${p.email}</td>
+            <td>${p.cidade || '—'}</td>
+            <td><span class="badge badge-${p.estado || 'ativo'}">${p.estado || 'ativo'}</span></td>
+            <td>
+                <div class="acoes-td">
+                    <button class="btn-sm azul" onclick="editarPrestador(${p.id})">Editar</button>
+                    <button class="btn-sm vermelho" onclick="eliminarPrestador(${p.id}, '${p.nome.replace(/'/g,"\\'")}')">Eliminar</button>
+                </div>
+            </td>
+        </tr>`).join('');
+}
+
+function editarPrestador(id) {
+    const p = todosPrestadores.find(x => x.id === id);
+    if (!p) return;
+    document.getElementById('p-id').value      = p.id;
+    document.getElementById('p-nome').value    = p.nome;
+    document.getElementById('p-telefone').value= p.telefone || '';
+    document.getElementById('p-cidade').value  = p.cidade   || '';
+    document.getElementById('p-morada').value  = p.morada   || '';
+    document.getElementById('p-estado').value  = p.estado   || 'ativo';
+    document.getElementById('modal-prestador').classList.add('aberto');
+}
+
+async function eliminarPrestador(id, nome) {
+    if (!confirm(`Eliminar o prestador "${nome}"?\nTodos os seus serviços serão também eliminados.`)) return;
+    try {
+        await api.prestadores.eliminar(id);
+        mostrarToast('Prestador eliminado.');
+        carregarPrestadores();
+    } catch (e) {
+        mostrarToast('Erro: ' + e.message, 'erro');
+    }
+}
+
+document.getElementById('form-prestador').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('p-id').value;
+    try {
+        await api.prestadores.atualizar(id, {
+            nome:     document.getElementById('p-nome').value,
+            telefone: document.getElementById('p-telefone').value,
+            cidade:   document.getElementById('p-cidade').value,
+            morada:   document.getElementById('p-morada').value,
+            estado:   document.getElementById('p-estado').value,
+        });
+        mostrarToast('Prestador atualizado.');
+        fecharModais();
+        carregarPrestadores();
+    } catch (e) {
+        mostrarToast('Erro: ' + e.message, 'erro');
+    }
+});
+
+// ── SERVIÇOS ─────────────────────────────────────────
+async function carregarServicos() {
+    try {
+        const resposta = await api.servicos.listar({ limite: 200 });
+        todosServicos = resposta.dados;
+        renderizarServicos(todosServicos);
+    } catch (e) {
+        mostrarToast('Erro ao carregar serviços.', 'erro');
+    }
+}
+
+function filtrarServicos() {
+    const termo = document.getElementById('pesq-servicos').value.toLowerCase();
+    renderizarServicos(
+        todosServicos.filter(s =>
+            s.nome.toLowerCase().includes(termo) ||
+            (s.prestador_nome || '').toLowerCase().includes(termo) ||
+            s.categoria.toLowerCase().includes(termo)
+        )
+    );
+}
+
+function renderizarServicos(lista) {
+    const tbody = document.getElementById('tabela-servicos');
+    if (!lista.length) {
+        tbody.innerHTML = '<tr class="linha-vazia"><td colspan="7">Nenhum serviço encontrado.</td></tr>';
+        return;
+    }
+    tbody.innerHTML = lista.map(s => `
+        <tr>
+            <td>${s.id}</td>
+            <td><strong>${s.nome}</strong></td>
+            <td>${s.prestador_nome || '—'}</td>
+            <td>${s.categoria}</td>
+            <td>${formatarPreco(s.preco)}</td>
+            <td><span class="badge badge-${s.estado}">${s.estado}</span></td>
+            <td>
+                <div class="acoes-td">
+                    <button class="btn-sm azul"    onclick="editarServico(${s.id})">Editar</button>
+                    <button class="btn-sm vermelho" onclick="eliminarServico(${s.id}, '${s.nome.replace(/'/g,"\\'")}')">Eliminar</button>
+                </div>
+            </td>
+        </tr>`).join('');
+}
+
+function editarServico(id) {
+    const s = todosServicos.find(x => x.id === id);
+    if (!s) return;
+    document.getElementById('sv-id').value        = s.id;
+    document.getElementById('sv-nome').value      = s.nome;
+    document.getElementById('sv-categoria').value = s.categoria;
+    document.getElementById('sv-preco').value     = s.preco;
+    document.getElementById('sv-estado').value    = s.estado;
+    document.getElementById('modal-servico').classList.add('aberto');
+}
+
+async function eliminarServico(id, nome) {
+    if (!confirm(`Eliminar o serviço "${nome}"?`)) return;
+    try {
+        await api.servicos.eliminar(id);
+        mostrarToast('Serviço eliminado.');
+        carregarServicos();
+    } catch (e) {
+        mostrarToast('Erro: ' + e.message, 'erro');
+    }
+}
+
+document.getElementById('form-servico-admin').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('sv-id').value;
+    const s  = todosServicos.find(x => x.id === Number(id));
+    try {
+        await api.servicos.atualizar(id, {
+            nome:         document.getElementById('sv-nome').value,
+            categoria:    document.getElementById('sv-categoria').value,
+            descricao:    s?.descricao || '',
+            preco:        document.getElementById('sv-preco').value,
+            duracao_horas:s?.duracao_horas || null,
+            estado:       document.getElementById('sv-estado').value,
+        });
+        mostrarToast('Serviço atualizado.');
+        fecharModais();
+        carregarServicos();
+    } catch (e) {
+        mostrarToast('Erro: ' + e.message, 'erro');
+    }
+});
+
+// ── Fechar modais ────────────────────────────────────
+function fecharModais() {
+    document.querySelectorAll('.modal-overlay').forEach(m => m.classList.remove('aberto'));
+}
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+    overlay.addEventListener('click', e => {
+        if (e.target === overlay) fecharModais();
+    });
+});
+
+// ── Iniciar com dashboard ────────────────────────────
+carregarDashboard();
+</script>
+</body>
+</html>

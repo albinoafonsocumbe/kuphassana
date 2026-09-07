@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Entrar — Plataforma Funerária</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/auth.css" />
+</head>
+<body class="auth-page">
+
+<nav class="navbar">
+    <div class="navbar-logo">
+        <span class="cruz">✝</span>
+        Plataforma <span>Funerária</span>
+    </div>
+    <div class="navbar-links">
+        <a href="../index.html">← Voltar ao início</a>
+    </div>
+</nav>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <span class="cruz">✝</span>
+            Plataforma <span>Funerária</span>
+        </div>
+        <div class="auth-divider"></div>
+
+        <h2>Bem-vindo de volta</h2>
+        <p class="auth-subtitulo">Introduza as suas credenciais para aceder à plataforma</p>
+
+        <div id="auth-erro" class="auth-erro">
+            <span>⚠</span> <span id="auth-erro-msg"></span>
+        </div>
+
+        <form id="form-login">
+            <div class="grupo">
+                <label for="email">Email</label>
+                <input type="email" id="email"
+                       placeholder="email@exemplo.pt"
+                       required autocomplete="email" />
+            </div>
+
+            <div class="grupo">
+                <label for="senha">Senha</label>
+                <input type="password" id="senha"
+                       placeholder="••••••••"
+                       required autocomplete="current-password" />
+            </div>
+
+            <button type="submit" class="btn-auth" id="btn-login">
+                <span id="btn-texto">Entrar na plataforma</span>
+            </button>
+        </form>
+
+        <div class="auth-sep">ou</div>
+
+        <div class="auth-rodape">
+            Não tem conta?
+            <a href="registar.html">Registar como prestador</a>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 Plataforma Funerária — Todos os direitos reservados.</p>
+</footer>
+
+<script src="../js/api.js"></script>
+<script>
+if (Auth.estaAutenticado()) {
+    const u = Auth.lerUtilizador();
+    window.location.href = u?.papel === 'admin' ? 'admin.html' : 'painel.html';
+}
+
+document.getElementById('form-login').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim();
+    const senha = document.getElementById('senha').value;
+    const btn   = document.getElementById('btn-login');
+    const texto = document.getElementById('btn-texto');
+    const erro  = document.getElementById('auth-erro');
+    const erroMsg = document.getElementById('auth-erro-msg');
+
+    erro.classList.remove('visivel');
+    btn.disabled = true;
+    texto.textContent = 'A verificar…';
+
+    try {
+        const res = await api.auth.login(email, senha);
+        Auth.guardarToken(res.token);
+        Auth.guardarUtilizador(res.utilizador);
+        texto.textContent = '✓ Sucesso! A redirecionar…';
+        setTimeout(() => {
+            const p = res.utilizador.papel;
+            window.location.href = p === 'admin'
+                ? 'admin.html'
+                : p === 'cliente'
+                    ? 'painel-cliente.html'
+                    : 'painel.html';
+        }, 600);
+    } catch (err) {
+        erroMsg.textContent = err.message;
+        erro.classList.add('visivel');
+        btn.disabled = false;
+        texto.textContent = 'Entrar na plataforma';
+    }
+});
+</script>
+</body>
+</html>

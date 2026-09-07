@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0"/>
+  <meta name="theme-color" content="#07070f"/>
+  <title>Serviço — Agência Funerária Kuphassana</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="stylesheet" href="../css/style.css"/>
+</head>
+<body>
+
+<nav class="navbar" id="nav">
+  <a href="../index.html" class="nav-logo">
+    <img
+      src="../assets/logo.png"
+      alt="Kuphassana"
+      class="nav-logo-img"
+      onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"
+    />
+    <div class="emblem" style="display:none">K</div>
+  </a>
+  <div class="nav-links">
+    <a href="../index.html#services">Serviços</a>
+    <a href="../index.html#about">A Empresa</a>
+    <a href="../index.html#contact" class="nav-cta">Contactar agora</a>
+  </div>
+  <button class="nav-hamburger" onclick="this.nextElementSibling.classList.toggle('open')" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+<div class="nav-mobile-menu">
+  <a href="../index.html#services">Serviços</a>
+  <a href="../index.html#about">A Empresa</a>
+  <a href="../index.html#contact" class="nav-mobile-cta">Contactar agora</a>
+</div>
+
+<div class="container detail-pg">
+  <button class="btn-back" onclick="history.back()">← Voltar aos serviços</button>
+  <div id="content">
+    <div class="loading"><div class="spin"></div><p>A carregar...</p></div>
+  </div>
+</div>
+
+<footer class="footer" style="padding-top:3rem;padding-bottom:1.5rem">
+  <div class="footer-btm" style="max-width:1280px;margin:0 auto;border-top:none;padding-top:0">
+    <span id="f-copy">© 2026 Agência Funerária Silva</span>
+    <a href="admin-login.html" style="opacity:.15;font-size:.72rem">Área Restrita</a>
+  </div>
+</footer>
+
+<script src="../js/api.js"></script>
+<script>
+const SIMG = 'http://localhost:3000';
+window.addEventListener('scroll', () =>
+  document.getElementById('nav').classList.toggle('slim', window.scrollY > 60));
+
+document.addEventListener('DOMContentLoaded', async () => {
+  const id = new URLSearchParams(location.search).get('id');
+  const el = document.getElementById('content');
+  if (!id) { el.innerHTML='<div class="empty"><p>Serviço não encontrado.</p></div>'; return; }
+
+  try {
+    const [re, rs] = await Promise.all([api.empresa.obter(), api.servicos.obter(id)]);
+    const e = re.dados || {}, s = rs.dados;
+
+    document.title = `${s.nome} — ${e.nome||'Agência Funerária Silva'}`;
+    document.getElementById('nav-name').textContent = e.nome||'Agência Funerária Silva';
+    document.getElementById('f-copy').textContent = `© ${new Date().getFullYear()} ${e.nome||'Agência Funerária Silva'}`;
+
+    const imgs = s.imagens?.length ? s.imagens : (s.imagem_url ? [s.imagem_url] : []);
+    const tel  = (e.telefone||'').replace(/[\s-]/g,'');
+    const wa   = e.whatsapp;
+    const msgWA  = encodeURIComponent(`Olá! Vi o serviço "${s.nome}" no vosso website. Gostaria de mais informações.`);
+    const msgSMS = encodeURIComponent(`Olá, vi "${s.nome}" e gostaria de informações.`);
+
+    const SVG_WA  = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`;
+    const SVG_TEL = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>`;
+    const SVG_SMS = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H5.17L4 17.17V4h16v12z"/></svg>`;
+    const SVG_EM  = `<svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>`;
+
+    el.innerHTML = `
+    <div class="detail-layout">
+      <!-- Gallery -->
+      <div class="gallery-stick">
+        <div class="gallery-main" id="gal-main">
+          ${imgs.length
+            ? `<img id="gal-img" src="${SIMG}${imgs[0]}" alt="${s.nome}"/>`
+            : `<div class="gallery-main-empty">${s.categoria.charAt(0)}</div>`}
+        </div>
+        ${imgs.length > 1 ? `
+        <div class="gallery-thumbs">
+          ${imgs.map((u,i) => `
+            <div class="g-thumb ${i===0?'on':''}" onclick="swapImg('${SIMG}${u}',this)">
+              <img src="${SIMG}${u}" alt="" loading="lazy"/>
+            </div>`).join('')}
+        </div>` : ''}
+      </div>
+      <!-- Info -->
+      <div>
+        <span class="detail-cat">${s.categoria}</span>
+        <h1 class="detail-title">${s.nome}</h1>
+        <div class="detail-meta">
+          <div class="detail-meta-item">
+            <span class="r">Valor</span>
+            ${s.preco && s.preco_visivel
+              ? `<span class="v">${formatarPreco(s.preco)}</span>`
+              : `<span class="v ask">Consultar</span>`}
+          </div>
+          ${s.duracao_horas ? `
+          <div class="detail-meta-item">
+            <span class="r">Duração</span>
+            <span class="v">${s.duracao_horas}h</span>
+          </div>` : ''}
+          <div class="detail-meta-item">
+            <span class="r">Estado</span>
+            <span class="v ${s.estado==='ativo'?'avail':'unavail'}">
+              ${s.estado==='ativo'?'Disponível':'Indisponível'}
+            </span>
+          </div>
+        </div>
+        ${s.descricao ? `
+        <p class="detail-about-title">Sobre este serviço</p>
+        <p class="detail-desc">${s.descricao}</p>` : ''}
+        <!-- Contact card -->
+        <div class="detail-contact">
+          <div class="dc-header">
+            <div class="dc-av">${(e.nome||'A').charAt(0)}</div>
+            <div>
+              <div class="name">${e.nome||'Agência Funerária'}</div>
+              <div class="loc">${e.cidade?e.cidade+', Moçambique':'Moçambique'}</div>
+            </div>
+          </div>
+          <div class="dc-body">
+            <span class="dc-label">Contactar directamente</span>
+            <div class="dc-btns">
+              ${wa ? `<a href="https://wa.me/${wa}?text=${msgWA}" target="_blank" rel="noopener" class="dc-btn dc-wa">${SVG_WA} WhatsApp — Contactar agora</a>` : ''}
+              ${tel ? `<a href="tel:${tel}" class="dc-btn dc-tel">${SVG_TEL} Ligar</a>` : ''}
+              ${e.email ? `<a href="mailto:${e.email}?subject=${encodeURIComponent('Informações — '+s.nome)}" class="dc-btn dc-email">${SVG_EM} Email</a>` : ''}
+            </div>
+            <p class="dc-note">Contacto directo com a agência, sem intermediários.</p>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  } catch(err) {
+    el.innerHTML = `<div class="empty"><p>Erro: ${err.message}</p></div>`;
+  }
+});
+
+function swapImg(src, thumb) {
+  document.getElementById('gal-img').src = src;
+  document.querySelectorAll('.g-thumb').forEach(t => t.classList.remove('on'));
+  thumb.classList.add('on');
+}
+</script>
+</body>
+</html>

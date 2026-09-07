@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Prestadores — Plataforma Funerária</title>
+    <link rel="stylesheet" href="../css/style.css" />
+    <style>
+        .page-header {
+            background: var(--cor-primaria);
+            color: #fff;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .page-header h1 { font-size: 2rem; margin-bottom: .5rem; }
+        .page-header p  { color: rgba(255,255,255,.75); }
+
+        .grid-prestadores {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .card-prestador {
+            background: var(--cor-branco);
+            border-radius: var(--raio);
+            box-shadow: var(--sombra);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: .5rem;
+            transition: transform .2s, box-shadow .2s;
+        }
+        .card-prestador:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.12);
+        }
+
+        .prestador-avatar {
+            width: 52px; height: 52px;
+            background: var(--cor-primaria);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: .25rem;
+        }
+
+        .card-prestador h3  { font-size: 1.05rem; color: var(--cor-primaria); }
+        .card-prestador .info { font-size: .85rem; color: var(--cor-texto-leve); }
+
+        .badge-estado {
+            display: inline-block;
+            font-size: .75rem;
+            padding: .2rem .6rem;
+            border-radius: 20px;
+            font-weight: 600;
+            align-self: flex-start;
+        }
+        .badge-ativo    { background: #d5f5e3; color: #1e8449; }
+        .badge-inativo  { background: #fdebd0; color: #a04000; }
+        .badge-suspenso { background: #fadbd8; color: #922b21; }
+
+        .acoes-comunicacao-p {
+            display: flex;
+            gap: .5rem;
+            flex-wrap: wrap;
+            margin-top: .5rem;
+        }
+        .btn-com-p {
+            display: inline-flex;
+            align-items: center;
+            gap: .35rem;
+            padding: .4rem .8rem;
+            border-radius: 50px;
+            font-size: .78rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all .2s;
+            border: none;
+            font-family: var(--fonte-corpo);
+        }
+        .btn-com-p:hover { transform: translateY(-1px); }
+        .btn-com-p.whats { background: #25D366; color: #fff; }
+        .btn-com-p.tel   { background: var(--cor-primaria); color: #fff; }
+        .btn-com-p.sms   { background: #007AFF; color: #fff; }
+
+        .btn-ver-servicos {
+            margin-top: .75rem;
+            padding: .55rem;
+            text-align: center;
+            background: var(--cor-fundo);
+            border: 1px solid var(--cor-borda);
+            border-radius: var(--raio);
+            font-size: .85rem;
+            cursor: pointer;
+            transition: all .2s;
+            color: var(--cor-primaria);
+            font-weight: 600;
+            text-decoration: none;
+            display: block;
+        }
+        .btn-ver-servicos:hover { background: var(--cor-primaria); color: #fff; border-color: var(--cor-primaria); }
+
+        .barra-filtro-prestadores {
+            display: flex;
+            gap: .75rem;
+            margin-top: 1.5rem;
+            flex-wrap: wrap;
+        }
+        .barra-filtro-prestadores input {
+            flex: 1;
+            min-width: 200px;
+            padding: .65rem 1.1rem;
+            border: 1.5px solid var(--cor-borda);
+            border-radius: 10px;
+            font-size: .92rem;
+            outline: none;
+            background: var(--cor-branco);
+            transition: border-color .2s;
+        }
+        .barra-filtro-prestadores input:focus { border-color: var(--cor-primaria); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar" id="navbar">
+    <div class="navbar-logo">✝ Plataforma <span>Funerária</span></div>
+    <div class="navbar-links">
+        <a href="../index.html">Início</a>
+        <a href="prestadores.html">Prestadores</a>
+        <a id="link-acesso" href="login.html" class="btn-nav">Entrar</a>
+    </div>
+</nav>
+
+<div class="page-header">
+    <h1>Prestadores de Serviços</h1>
+    <p>Empresas e agências funerárias certificadas prontas para prestar apoio imediato</p>
+</div>
+
+<main class="container">
+
+    <div class="barra-filtro-prestadores">
+        <input type="text" id="filtro-nome" placeholder="🔍 Pesquisar agência por nome…" />
+        <input type="text" id="filtro-cidade-p" placeholder="📍 Filtrar por cidade (ex: Lisboa, Porto)…" />
+    </div>
+
+    <div id="grid-prestadores" class="grid-prestadores">
+        <div class="estado-loading">
+            <div class="spinner"></div>
+            <p>A carregar prestadores…</p>
+        </div>
+    </div>
+
+</main>
+
+<footer>
+    <p>© 2026 Plataforma Funerária. Todos os direitos reservados.</p>
+</footer>
+
+<script src="../js/api.js"></script>
+<script>
+let todosPrestadores = [];
+
+// Atualizar link de acesso
+const utilizador = Auth.lerUtilizador();
+if (utilizador) {
+    const el = document.getElementById('link-acesso');
+    el.textContent = utilizador.nome.split(' ')[0];
+    el.href = utilizador.papel === 'admin'
+        ? 'admin.html'
+        : utilizador.papel === 'cliente'
+            ? 'painel-cliente.html'
+            : 'painel.html';
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await carregarPrestadores();
+
+    document.getElementById('filtro-nome').addEventListener('input', filtrar);
+    document.getElementById('filtro-cidade-p').addEventListener('input', filtrar);
+});
+
+async function carregarPrestadores() {
+    try {
+        const resposta = await api.prestadores.listar();
+        todosPrestadores = resposta.dados || [];
+        renderizar(todosPrestadores);
+    } catch (e) {
+        document.getElementById('grid-prestadores').innerHTML =
+            '<div class="estado-vazio"><div class="icone">⚠️</div><p>Erro ao carregar prestadores.</p></div>';
+    }
+}
+
+function filtrar() {
+    const nome   = document.getElementById('filtro-nome').value.toLowerCase();
+    const cidade = document.getElementById('filtro-cidade-p').value.toLowerCase();
+
+    const filtrados = todosPrestadores.filter(p =>
+        (p.nome || '').toLowerCase().includes(nome) &&
+        (p.cidade || '').toLowerCase().includes(cidade)
+    );
+    renderizar(filtrados);
+}
+
+function renderizar(prestadores) {
+    const el = document.getElementById('grid-prestadores');
+
+    if (!prestadores.length) {
+        el.innerHTML = '<div class="estado-vazio"><div class="icone">🔍</div><p>Nenhum prestador encontrado.</p></div>';
+        return;
+    }
+
+    const clienteNome = utilizador?.nome || 'Cliente';
+
+    el.innerHTML = prestadores.map(p => {
+        const tel = p.telefone || '';
+        const msgWhats = `Olá ${p.nome}, sou ${clienteNome}. Encontrei a vossa agência na Plataforma Funerária e gostaria de solicitar informações sobre os vossos serviços funerários.`;
+        const msgSMS   = `Olá ${p.nome}, sou ${clienteNome} e gostaria de informações sobre serviços funerários.`;
+
+        const linkWhats = ContactUtils.linkWhatsApp(tel, msgWhats);
+        const linkCham  = ContactUtils.linkChamada(tel);
+        const linkSms   = ContactUtils.linkSMS(tel, msgSMS);
+        const logoStyle = p.logo_url ? `background-image:url('${p.logo_url}');background-size:cover;background-position:center;color:transparent;` : '';
+
+        return `
+            <div class="card-prestador">
+                <div style="display:flex;align-items:center;gap:1rem;margin-bottom:.5rem;">
+                    <div class="prestador-avatar" style="${logoStyle}">${p.logo_url ? '' : (p.nome || '?').charAt(0).toUpperCase()}</div>
+                    <div>
+                        <h3 style="margin-bottom:.2rem;">${p.nome}</h3>
+                        <div class="info">📍 ${p.cidade || 'Portugal'} ${p.nif ? `· NIF: ${p.nif}` : ''}</div>
+                    </div>
+                </div>
+
+                ${p.horario ? `<div style="font-size:.78rem;color:#92660a;background:#fef9ec;padding:.2rem .6rem;border-radius:50px;display:inline-block;border:1px solid #f5e4a0;font-weight:600;align-self:flex-start;">🕒 ${p.horario}</div>` : ''}
+                ${p.areas_atuacao ? `<div class="info" style="font-size:.8rem;color:#555;"><strong>Áreas:</strong> ${p.areas_atuacao}</div>` : ''}
+                ${p.descricao ? `<p style="font-size:.82rem;color:var(--cor-texto-leve);line-height:1.4;margin:.25rem 0;">${p.descricao.slice(0, 110)}${p.descricao.length > 110 ? '…' : ''}</p>` : ''}
+                ${tel ? `<div class="info" style="font-weight:600;color:#2c3e50;">📞 ${ContactUtils.formatarExibicao(tel)}</div>` : ''}
+                <div style="font-size:.8rem;color:#f39c12;font-weight:600;">★ Agência Certificada · Apoio 24h</div>
+
+                ${tel ? `
+                    <div class="acoes-comunicacao-p">
+                        <a href="${linkWhats}" target="_blank" rel="noopener" class="btn-com-p whats" title="Falar no WhatsApp">
+                            <span>💬</span> WhatsApp
+                        </a>
+                        <a href="${linkCham}" class="btn-com-p tel" title="Ligar">
+                            <span>📞</span> Ligar
+                        </a>
+                        <a href="${linkSms}" class="btn-com-p sms" title="SMS">
+                            <span>✉️</span> SMS
+                        </a>
+                    </div>
+                ` : ''}
+
+                <a href="../index.html" class="btn-ver-servicos">
+                    Ver serviços no catálogo →
+                </a>
+            </div>
+        `;
+    }).join('');
+}
+</script>
+</body>
+</html>

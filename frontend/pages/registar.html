@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Registar — Plataforma Funerária</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="../css/style.css" />
+    <link rel="stylesheet" href="../css/auth.css" />
+    <style>
+        .auth-card { max-width: 520px; }
+    </style>
+</head>
+<body class="auth-page">
+
+<nav class="navbar">
+    <div class="navbar-logo">
+        <span class="cruz">✝</span>
+        Plataforma <span>Funerária</span>
+    </div>
+    <div class="navbar-links">
+        <a href="../index.html">← Voltar ao início</a>
+    </div>
+</nav>
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+
+        <div class="auth-logo">
+            <span class="cruz">✝</span>
+            Plataforma <span>Funerária</span>
+        </div>
+        <div class="auth-divider"></div>
+
+        <h2>Criar conta de prestador</h2>
+        <p class="auth-subtitulo">Registe a sua empresa e comece a oferecer serviços funerários</p>
+
+        <div id="auth-erro"    class="auth-erro">
+            <span>⚠</span> <span id="auth-erro-msg"></span>
+        </div>
+        <div id="auth-sucesso" class="auth-sucesso">
+            <span>✓</span> <span id="auth-suc-msg"></span>
+        </div>
+
+        <form id="form-registar">
+            <div class="grupo">
+                <label>Nome da empresa / prestador *</label>
+                <input type="text" id="nome"
+                       placeholder="Funerária Silva, Lda."
+                       required />
+            </div>
+
+            <div class="grupo">
+                <label>Email *</label>
+                <input type="email" id="email"
+                       placeholder="email@empresa.pt"
+                       required autocomplete="email" />
+            </div>
+
+            <div class="linha-dupla">
+                <div class="grupo">
+                    <label>Telefone</label>
+                    <input type="tel" id="telefone" placeholder="912 345 678" />
+                </div>
+                <div class="grupo">
+                    <label>Cidade</label>
+                    <input type="text" id="cidade" placeholder="Lisboa" />
+                </div>
+            </div>
+
+            <div class="grupo">
+                <label>Morada</label>
+                <input type="text" id="morada" placeholder="Rua Exemplo, 123" />
+            </div>
+
+            <div class="grupo">
+                <label>Senha *</label>
+                <input type="password" id="senha"
+                       placeholder="Mínimo 6 caracteres"
+                       required minlength="6"
+                       autocomplete="new-password" />
+                <div class="forca-senha"><div id="barra-forca"></div></div>
+                <div class="forca-label" id="dica-forca" style="color:var(--cor-texto-leve);"></div>
+            </div>
+
+            <div class="grupo">
+                <label>Confirmar senha *</label>
+                <input type="password" id="confirmar-senha"
+                       placeholder="Repetir senha"
+                       required
+                       autocomplete="new-password" />
+            </div>
+
+            <button type="submit" class="btn-auth" id="btn-reg">
+                <span id="btn-texto">Criar conta gratuitamente</span>
+            </button>
+        </form>
+
+        <div class="auth-sep">ou</div>
+        <div class="auth-rodape">
+            Já tem conta? <a href="login.html">Entrar</a>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 Plataforma Funerária — Todos os direitos reservados.</p>
+</footer>
+
+<script src="../js/api.js"></script>
+<script>
+// Indicador força da senha
+document.getElementById('senha').addEventListener('input', function () {
+    const v = this.value;
+    let f = 0;
+    if (v.length >= 6)           f++;
+    if (v.length >= 10)          f++;
+    if (/[A-Z]/.test(v))         f++;
+    if (/[0-9]/.test(v))         f++;
+    if (/[^A-Za-z0-9]/.test(v))  f++;
+
+    const niveis = [
+        { w: '0%',   c: '',         t: '' },
+        { w: '25%',  c: '#e74c3c',  t: 'Fraca' },
+        { w: '50%',  c: '#e67e22',  t: 'Razoável' },
+        { w: '75%',  c: '#f1c40f',  t: 'Boa' },
+        { w: '100%', c: '#2ecc71',  t: 'Excelente' },
+    ];
+    const n = niveis[Math.min(f, 4)];
+    const b = document.getElementById('barra-forca');
+    b.style.width = n.w;
+    b.style.background = n.c;
+    document.getElementById('dica-forca').textContent = n.t;
+    document.getElementById('dica-forca').style.color = n.c;
+});
+
+document.getElementById('form-registar').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const nome     = document.getElementById('nome').value.trim();
+    const email    = document.getElementById('email').value.trim();
+    const telefone = document.getElementById('telefone').value.trim();
+    const cidade   = document.getElementById('cidade').value.trim();
+    const morada   = document.getElementById('morada').value.trim();
+    const senha    = document.getElementById('senha').value;
+    const confirmar = document.getElementById('confirmar-senha').value;
+
+    const elErro = document.getElementById('auth-erro');
+    const elSuc  = document.getElementById('auth-sucesso');
+    const btn    = document.getElementById('btn-reg');
+    const texto  = document.getElementById('btn-texto');
+
+    elErro.classList.remove('visivel');
+    elSuc.classList.remove('visivel');
+
+    if (senha !== confirmar) {
+        document.getElementById('auth-erro-msg').textContent = 'As senhas não coincidem.';
+        elErro.classList.add('visivel');
+        return;
+    }
+
+    btn.disabled = true;
+    texto.textContent = 'A criar conta…';
+
+    try {
+        const res = await api.auth.registar({ nome, email, telefone, cidade, morada, senha });
+        Auth.guardarToken(res.token);
+        Auth.guardarUtilizador(res.utilizador);
+
+        document.getElementById('auth-suc-msg').textContent = 'Conta criada! A redirecionar…';
+        elSuc.classList.add('visivel');
+        setTimeout(() => { window.location.href = 'painel.html'; }, 1200);
+    } catch (err) {
+        document.getElementById('auth-erro-msg').textContent = err.message;
+        elErro.classList.add('visivel');
+        btn.disabled = false;
+        texto.textContent = 'Criar conta gratuitamente';
+    }
+});
+</script>
+</body>
+</html>

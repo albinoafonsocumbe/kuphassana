@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=5.0"/>
+  <meta name="theme-color" content="#07070f"/>
+  <title>Acesso Administrativo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"/>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,600;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#07070f;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1.5rem}
+    .wrap{width:100%;max-width:420px}
+    .card{background:#0e0e1c;border:1px solid rgba(255,255,255,.07);border-radius:22px;overflow:hidden}
+    .card-top{height:3px;background:linear-gradient(135deg,#b8923a,#d4aa60,#b8923a)}
+    .card-body{padding:2.75rem}
+    .logo{display:flex;align-items:center;justify-content:center;gap:.8rem;margin-bottom:2.25rem}
+    .logo-emb{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,#b8923a,#d4aa60);display:flex;align-items:center;justify-content:center;font-size:.9rem;font-weight:600;color:#07070f;box-shadow:0 8px 28px rgba(184,146,58,.3)}
+    .logo span{font-family:'Cormorant Garamond',serif;font-size:1.15rem;color:#fff}
+    h1{font-family:'Cormorant Garamond',serif;font-size:1.6rem;color:#fff;text-align:center;margin-bottom:.35rem}
+    .sub{text-align:center;color:rgba(255,255,255,.3);font-size:.8rem;margin-bottom:2.25rem}
+    .field{margin-bottom:1.1rem}
+    .field label{display:block;font-size:.63rem;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:rgba(255,255,255,.3);margin-bottom:.5rem}
+    .field input{width:100%;padding:.82rem 1rem;background:#07070f;border:1.5px solid rgba(255,255,255,.08);border-radius:11px;font-size:.875rem;color:#fff;font-family:'Inter',sans-serif;outline:none;transition:border-color .2s}
+    .field input:focus{border-color:rgba(184,146,58,.5)}
+    .field input::placeholder{color:rgba(255,255,255,.18)}
+    .btn{width:100%;padding:.95rem;margin-top:.5rem;background:linear-gradient(135deg,#b8923a,#d4aa60,#b8923a);color:#07070f;font-weight:700;font-size:.875rem;border:none;border-radius:11px;cursor:pointer;transition:all .22s;font-family:'Inter',sans-serif}
+    .btn:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(184,146,58,.4)}
+    .btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+    .err{background:rgba(153,27,27,.15);border:1px solid rgba(248,113,113,.25);color:#fca5a5;border-radius:9px;padding:.75rem 1rem;font-size:.82rem;margin-bottom:1rem;display:none}
+    .err.show{display:block}
+    .back{text-align:center;margin-top:1.6rem}
+    .back a{font-size:.75rem;color:rgba(255,255,255,.18);transition:color .2s}
+    .back a:hover{color:rgba(255,255,255,.45)}
+    @media(max-width:480px){
+      body{padding:1rem}
+      .card-body{padding:2rem 1.5rem}
+      h1{font-size:1.35rem}
+    }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card">
+    <div class="card-top"></div>
+    <div class="card-body">
+      <div class="logo">
+        <img src="../assets/logo.png" alt="Kuphassana" style="height:64px;width:auto;border-radius:8px;margin-bottom:.5rem" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+        <div class="logo-emb" style="display:none">K</div>
+      </div>
+      <p style="font-size:.6rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--gold,#b8923a);margin-bottom:.25rem">Agência Funerária</p>
+      <p class="logo-name" id="co-name" style="font-family:'Libre Baskerville',serif;font-size:1.3rem;color:#fff;font-weight:700;margin-bottom:2rem">Kuphassana</p>
+      <h1>Área Administrativa</h1>
+      <p class="sub">Acesso exclusivo para administradores</p>
+      <div class="err" id="err"></div>
+      <form id="form">
+        <div class="field"><label>Email</label><input type="email" id="em" placeholder="admin@empresa.co.mz" required autocomplete="email"/></div>
+        <div class="field"><label>Senha</label><input type="password" id="pw" placeholder="••••••••" required autocomplete="current-password"/></div>
+        <button type="submit" class="btn" id="btn">Entrar no painel</button>
+      </form>
+      <div class="back"><a href="../index.html">Voltar ao website</a></div>
+    </div>
+  </div>
+</div>
+<script src="../js/api.js"></script>
+<script>
+if (Auth.estaLogado()) window.location.href = 'admin-painel.html';
+api.empresa.obter().then(r => {
+  if (r.dados?.nome) {
+    const simple = r.dados.nome.replace(/ag[eê]ncia funer[aá]ria\s*/i,'').trim();
+    document.getElementById('co-name').textContent = simple || r.dados.nome;
+    document.title = `Admin — ${r.dados.nome}`;
+  }
+}).catch(()=>{});
+document.getElementById('form').addEventListener('submit', async e => {
+  e.preventDefault();
+  const err = document.getElementById('err');
+  const btn = document.getElementById('btn');
+  err.classList.remove('show');
+  btn.disabled = true; btn.textContent = 'A verificar...';
+  try {
+    const r = await api.auth.login(document.getElementById('em').value.trim(), document.getElementById('pw').value);
+    Auth.guardarToken(r.token); Auth.guardarAdmin(r.utilizador);
+    window.location.href = 'admin-painel.html';
+  } catch(ex) {
+    err.textContent = ex.message; err.classList.add('show');
+    btn.disabled = false; btn.textContent = 'Entrar no painel';
+  }
+});
+</script>
+</body>
+</html>
