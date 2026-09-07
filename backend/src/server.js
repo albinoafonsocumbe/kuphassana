@@ -501,4 +501,9 @@ app.get('/api/setup', async (req, res) => {
 
 app.use((req, res) => res.status(404).json({ sucesso: false, mensagem: 'Rota não encontrada.' }));
 
-app.listen(PORT, () => console.log(`🚀 Servidor em http://localhost:${PORT}`));
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor em http://localhost:${PORT}`);
+    console.log(`   NODE_ENV: ${process.env.NODE_ENV || 'development'}`);
+    console.log(`   DATABASE_URL: ${process.env.DATABASE_URL ? 'DEFINIDA ✅' : 'NÃO DEFINIDA ❌'}`);
+    console.log(`   DB_HOST: ${process.env.DB_HOST || 'não definido'}`);
+});
