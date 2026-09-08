@@ -30,7 +30,10 @@
 <!-- ═══════════ NAVBAR ═══════════ -->
 <nav class="navbar" id="nav">
 
-  <!-- Coluna 1: Logo -->
+  <!-- Coluna 1: placeholder (vazia em mobile, serve para centrar a logo) -->
+  <div class="nav-spacer"></div>
+
+  <!-- Coluna 2: Logo centrada -->
   <a href="#" class="nav-logo">
     <img
       src="assets/logo.png"
@@ -41,15 +44,13 @@
     <div class="emblem" style="display:none">K</div>
   </a>
 
-  <!-- Coluna 2: Links centrados -->
-  <div class="nav-links">
-    <a href="#services">Serviços</a>
-    <a href="#about">A Empresa</a>
-    <a href="#contact">Contacto</a>
-  </div>
-
-  <!-- Coluna 3: CTA + Hamburger -->
+  <!-- Coluna 3: Links (desktop) + CTA + Hamburger (mobile) -->
   <div class="nav-right">
+    <div class="nav-links">
+      <a href="#services">Serviços</a>
+      <a href="#about">A Empresa</a>
+      <a href="#contact">Contacto</a>
+    </div>
     <a href="#contact" class="nav-cta">Contactar agora</a>
     <button class="nav-hamburger" id="nav-hamburger" onclick="toggleMenu()" aria-label="Menu">
       <span></span><span></span><span></span>
